@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .articles-content iframe {
+    @apply w-11/12 max-w-md mx-auto h-72 max-h-96;
+  }
+}
+
+@layer components {
+  /* .ql-toolbar {
+    @apply absolute top-10 left-0 right-0;
+  } */
+}
