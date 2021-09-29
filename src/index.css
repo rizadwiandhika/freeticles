@@ -3,13 +3,23 @@
 @tailwind utilities;
 
 @layer base {
-  .articles-content iframe {
-    @apply w-11/12 max-w-md mx-auto h-72 max-h-96;
+  .article-content iframe {
+    @apply w-11/12 max-w-screen-md mx-auto h-72 max-h-96;
+  }
+  .ql-editor iframe {
+    @apply w-11/12 mx-auto h-72 max-h-96;
+    max-width: 768px !important; /* max-w-screen-md */
+  }
+  .ql-editor p {
+    @apply text-base;
   }
 }
 
 @layer components {
   /* .ql-toolbar {
-    @apply absolute top-10 left-0 right-0;
+    @apply absolute top-0 left-0 right-0 bg-white z-10;
   } */
+  .ql-toolbar {
+    @apply sticky top-0 left-0 right-0 bg-white z-10;
+  }
 }

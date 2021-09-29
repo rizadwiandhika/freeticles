@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 import ReactQuill from 'react-quill'
-import ReactMarkdown from 'react-markdown'
 import Quill from 'quill'
-import gfm from 'remark-gfm'
-import rehypeRaw from 'rehype-raw'
+
+import { uploadImage } from '../../firebase'
 
 import Navbar from '../../components/Navbar'
+import PopupPage from '../../components/PopupPage'
+import LabelRounded from '../../components/UI/LabelRounded'
 
 import 'react-quill/dist/quill.snow.css'
 
@@ -23,60 +24,124 @@ Link.sanitize = function (url) {
 
 export default function Index() {
   const [text, setText] = useState('')
+  const [isPreview, setIsPreview] = useState(false)
+  const quillRef = useRef(null)
 
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      ['link', 'image', 'video']
-    ]
+  function togglePreview(e) {
+    e.preventDefault()
+    setIsPreview((prev) => !prev)
   }
 
-  const formats = [
-    'header',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'blockquote',
-    'list',
-    'bullet',
-    'link',
-    'image',
-    'video'
-  ]
+  // https://stackoverflow.com/questions/59825450/react-quill-custom-image-handler-module-causing-typing-issues-with-the-editor
+  const { modules, formats } = useMemo(() => {
+    return {
+      modules: {
+        toolbar: {
+          container: [
+            [{ header: [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['link', 'image', 'video']
+          ],
+          handlers: {
+            image: function () {
+              const input = document.createElement('input')
 
-  /* Markdown preview...
-    <div className="h-screen overflow-y-auto bg-yellow-100 col-span-7">
-      <ReactMarkdown
-        children={text}
-        className="prose prose-blue articles-content"
-        remarkPlugins={[gfm]}
-        rehypePlugins={[rehypeRaw]}
-      />
-    </div>
-  */
+              input.setAttribute('type', 'file')
+              input.setAttribute('accept', 'image/*')
+              input.click()
+
+              input.onchange = async () => {
+                const file = input.files[0]
+                const quill = quillRef.current.getEditor()
+                //// const formData = new FormData()
+                //// formData.append('image', file)
+
+                console.log(file)
+
+                // Save current cursor state
+                const range = quill.getSelection(true)
+
+                // Insert temporary loading placeholder image
+                quill.insertEmbed(
+                  range.index,
+                  'image',
+                  // `${window.location.origin}/images/loaders/placeholder.gif`
+                  'https://images.unsplash.com/photo-1607434472257-d9f8e57a643d?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=872&q=80'
+                )
+
+                // Move cursor to right side of image (easier to continue typing)
+                quill.setSelection(range.index + 1)
+
+                // API post, returns image location as string e.g. 'http://www.example.com/images/foo.png'
+                const [url, error] = await uploadImage('default', file)
+
+                // Remove placeholder image
+                quill.deleteText(range.index, 1)
+
+                if (error) return console.error(error)
+
+                console.log('upload finished. url', url)
+                // Insert uploaded image
+                quill.insertEmbed(range.index, 'image', url)
+              }
+            }
+          }
+        }
+      },
+      formats: [
+        'header',
+        'bold',
+        'italic',
+        'underline',
+        'strike',
+        'blockquote',
+        'list',
+        'bullet',
+        'link',
+        'image',
+        'video'
+      ]
+    }
+  }, [])
 
   return (
-    <div className="max-h-screen overflow-y-hidden">
-      <Navbar />
-      <div className="w-11/12 max-w-screen-md mx-auto">
-        <div className="the-editor-container h-screen">
-          <ReactQuill
-            scrollingContainer=".the-editor-container"
-            className="h-full"
-            theme="snow"
-            bounds=".the-editor-container"
-            modules={modules}
-            formats={formats}
-            placeholder="Write a story..."
-            value={text}
-            onChange={setText}
-          />
+    <>
+      <Navbar>
+        <LabelRounded clicked={togglePreview} text="Preview" />
+        <LabelRounded blue text="Publish" />
+      </Navbar>
+
+      {isPreview ? (
+        <PopupPage togglePreview={togglePreview} article={text} />
+      ) : (
+        <div
+          // - relative
+          // * karena .ql-toolbar itu gw buat sticky
+          className="w-11/12 max-w-screen-md my-5 mx-auto"
+        >
+          <div
+            // - h-screen min-h-full overflow-y-auto pt-10
+            // * .ql-toolbar itu sticky
+            className="the-editor-container"
+          >
+            <ReactQuill
+              ref={quillRef}
+              scrollingContainer=".the-editor-container"
+              // className="min-h-full h-auto"
+              // * .ql-toolbar itu sticky
+              theme="snow"
+              bounds=".the-editor-container"
+              modules={modules}
+              formats={formats}
+              placeholder="Write a story..."
+              value={text}
+              onChange={setText}
+            />
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   )
 }
 

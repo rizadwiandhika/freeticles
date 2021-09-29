@@ -6,6 +6,7 @@ module.exports = {
       typography: {
         DEFAULT: {
           css: {
+            width: '100%',
             color: '#333',
             strong: {
               fontWeight: '600'

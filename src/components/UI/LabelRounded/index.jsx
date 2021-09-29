@@ -5,13 +5,9 @@ const colorMap = {
   gray: 'text-gray-600'
 }
 
-const bgColorMap = {
-  
-}
+const bgColorMap = {}
 
-const boderColorMap = {
-
-}
+const boderColorMap = {}
 
 export default function LabelRounded(props) {
   const px = props.px ? `px-${props.px}` : 'px-4'
@@ -22,6 +18,7 @@ export default function LabelRounded(props) {
 
   return (
     <div
+      onClick={props.clicked}
       className={`hover:cursor-pointer min-w-min flex justify-center box-border items-center rounded-3xl border border-blue-600 ${px} ${py}  ${color} ${bgColor} `}
     >
       {props.text}
