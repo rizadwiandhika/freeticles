@@ -1,35 +1,54 @@
 import React, { useState, useRef, useMemo } from 'react'
 import ReactQuill from 'react-quill'
 import Quill from 'quill'
-
 import { uploadImage } from '../../firebase'
 
+import Article from '../../components/Article'
+import Overlay from '../../components/Overlay'
 import Navbar from '../../components/Navbar'
-import PopupPage from '../../components/PopupPage'
 import LabelRounded from '../../components/UI/LabelRounded'
+import { XIcon } from '@heroicons/react/outline'
+import Input from '../../components/UI/Input'
 
 import 'react-quill/dist/quill.snow.css'
 
 // https://github.com/zenoamaro/react-quill/issues/529
-// Supaya link pada quil ngga prepend dari localhost:3000/
+// Quill by default creates relative links if scheme is missing.
 const Link = Quill.import('formats/link')
 Link.sanitize = function (url) {
-  // quill by default creates relative links if scheme is missing.
-  if (!(url.startsWith('http://') || url.startsWith('https://'))) {
-    return `http://${url}`
-  }
-
-  return url
+  return url.startsWith('http://') || url.startsWith('https://')
+    ? url
+    : `http://${url}`
 }
 
 export default function Index() {
-  const [text, setText] = useState('')
+  const [articleMeta, setArticleMeta] = useState({
+    title: '',
+    subtitle: '',
+    tags: []
+  })
+  const [article, setArticle] = useState('')
+  const [inputTag, setInputTag] = useState('')
   const [isPreview, setIsPreview] = useState(false)
+  const [isPublish, setIsPublish] = useState(false)
+
   const quillRef = useRef(null)
 
+  function handleArticleMetaChange(e) {
+    const { name, value } = e.target
+    setArticleMeta({ ...articleMeta, [name]: value })
+  }
+
   function togglePreview(e) {
-    e.preventDefault()
+    e.preventDefault?.()
+    e.stopPropagation?.()
     setIsPreview((prev) => !prev)
+  }
+
+  function togglePublish(e) {
+    e.preventDefault?.()
+    e.stopPropagation?.()
+    setIsPublish((prev) => !prev)
   }
 
   // https://stackoverflow.com/questions/59825450/react-quill-custom-image-handler-module-causing-typing-issues-with-the-editor
@@ -39,9 +58,10 @@ export default function Index() {
         toolbar: {
           container: [
             [{ header: [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+            ['bold', 'italic', 'underline', 'strike'],
             [{ list: 'ordered' }, { list: 'bullet' }],
-            ['link', 'image', 'video']
+            ['link', 'image', 'video'],
+            ['blockquote', 'code-block']
           ],
           handlers: {
             image: function () {
@@ -82,6 +102,7 @@ export default function Index() {
                 if (error) return console.error(error)
 
                 console.log('upload finished. url', url)
+
                 // Insert uploaded image
                 quill.insertEmbed(range.index, 'image', url)
               }
@@ -100,7 +121,8 @@ export default function Index() {
         'bullet',
         'link',
         'image',
-        'video'
+        'video',
+        'code-block'
       ]
     }
   }, [])
@@ -109,40 +131,136 @@ export default function Index() {
     <>
       <Navbar>
         <LabelRounded clicked={togglePreview} text="Preview" />
-        <LabelRounded blue text="Publish" />
+        <LabelRounded clicked={togglePublish} blue text="Publish" />
       </Navbar>
 
-      {isPreview ? (
-        <PopupPage togglePreview={togglePreview} article={text} />
-      ) : (
-        <div
-          // - relative
-          // * karena .ql-toolbar itu gw buat sticky
-          className="w-11/12 max-w-screen-md my-5 mx-auto"
-        >
-          <div
-            // - h-screen min-h-full overflow-y-auto pt-10
-            // * .ql-toolbar itu sticky
-            className="the-editor-container"
-          >
-            <ReactQuill
-              ref={quillRef}
-              scrollingContainer=".the-editor-container"
-              // className="min-h-full h-auto"
-              // * .ql-toolbar itu sticky
-              theme="snow"
-              bounds=".the-editor-container"
-              modules={modules}
-              formats={formats}
-              placeholder="Write a story..."
-              value={text}
-              onChange={setText}
+      {/* Preview article */}
+      <Overlay
+        noOverlayBackdrop
+        isOpen={isPreview}
+        closeOverlay={togglePreview}
+      >
+        <div className="relative w-full bg-white">
+          <div className="relative py-24 w-11/12 min-h-screen max-w-screen-md mx-auto">
+            <XIcon
+              onClick={togglePreview}
+              className="absolute right-2 transform -translate-y-12 hover:cursor-pointer"
+              width={24}
             />
+            <Article articleMeta={articleMeta} article={article} />
           </div>
         </div>
-      )}
+      </Overlay>
+
+      {/* Publish article */}
+      <Overlay
+        noOverlayBackdrop
+        isOpen={isPublish}
+        closeOverlay={togglePublish}
+      >
+        <div className="relative w-full bg-white">
+          <div className="relative py-24 w-11/12 min-h-screen max-w-screen-lg mx-auto">
+            <XIcon
+              onClick={togglePublish}
+              className="absolute right-2 transform -translate-y-12 hover:cursor-pointer"
+              width={24}
+            />
+            <div className="md:grid grid-cols-2 gap-x-16">
+              <div className="md:col-span-1">
+                <h1 className="text-2xl font-bold">Story Preview</h1>
+                <img
+                  className="block my-8 max-h-72 object-cover"
+                  src={findThumbnail(article)}
+                  alt="thumbnail-article"
+                />
+                <h1 className="my-8 pb-2 border-b border-gray-300 text-2xl font-bold">
+                  {articleMeta.title}
+                </h1>
+                <h3 className="my-4 pb-2 border-b border-gray-300 text-base text-gray-400">
+                  {articleMeta.subtitle}
+                </h3>
+              </div>
+              <div className="md:col-span-1">
+                <h1 className="text-2xl">
+                  Publisher: <strong>Riza Dwi Andhika</strong>
+                </h1>
+                <div className="mt-8 max-w-sm">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      const { tags } = articleMeta
+
+                      setInputTag('')
+                      if (tags.includes((tag) => tag === inputTag)) return
+
+                      setArticleMeta({
+                        ...articleMeta,
+                        tags: [...articleMeta.tags, inputTag]
+                      })
+                    }}
+                  >
+                    <Input
+                      name="tag"
+                      value={inputTag}
+                      placeholder="Add tags..."
+                      handleChange={(e) => setInputTag(e.target.value)}
+                    />
+                    <button type="submit" />
+                  </form>
+                  <div className="flex flex-wrap gap-2">
+                    {articleMeta.tags.map((tag) => (
+                      <LabelRounded key={tag} text={tag} />
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-8 w-36 font-bold">
+                  <LabelRounded blue text="Publish now" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Overlay>
+
+      <div className="w-11/12 max-w-screen-md my-5 mx-auto">
+        <div>
+          <Input
+            name="title"
+            value={articleMeta.title}
+            placeholder="Title..."
+            handleChange={handleArticleMetaChange}
+          />
+        </div>
+        <div className="my-4">
+          <Input
+            name="subtitle"
+            value={articleMeta.subtitle}
+            placeholder="Subtitle..."
+            handleChange={handleArticleMetaChange}
+          />
+        </div>
+        <div className="the-editor-container">
+          <ReactQuill
+            ref={quillRef}
+            scrollingContainer=".the-editor-container"
+            theme="snow"
+            bounds=".the-editor-container"
+            modules={modules}
+            formats={formats}
+            placeholder="Write a story..."
+            value={article}
+            onChange={setArticle}
+          />
+        </div>
+      </div>
     </>
   )
+}
+
+function findThumbnail(article) {
+  const imageTagRegex = /<img src=".*">/
+  const urlRegex = /".*"/
+  return article?.match(imageTagRegex)?.[0]?.match(urlRegex)?.[0]?.slice(1, -1)
 }
 
 /* 
@@ -166,4 +284,4 @@ export default function Index() {
   </div> 
 */
 
-// Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia perferendis sunt eos vero qui nostrum, et inventore unde molestiae at incidunt totam eaque aliquam, mollitia eum, dolore voluptatibus veritatis repellendus. Asperiores neque minus inventore, quas unde nisi illum ullam eius id officia atque modi amet qui nemo suscipit voluptate dicta, magnam fuga quibusdam. Voluptatem sint exercitationem doloremque nemo quo corporis tempore sed? Neque ab repellendus officia tempore aliquid mollitia, dignissimos culpa voluptatibus nisi odio fugiat, veniam inventore architecto cumque ea! Facilis repellat at, hic dignissimos mollitia perferendis fuga quisquam quos labore eum. Sapiente ipsa quidem voluptas eum consequatur dignissimos vitae dolorem dolore doloribus hic neque unde animi eius similique, asperiores tempore sunt. Quaerat officia eius, laboriosam natus ex officiis tempora minus saepe praesentium earum error corrupti et iste perspiciatis molestias maxime amet laborum molestiae cum optio repellendus. Maiores deserunt, placeat voluptatum cumque iure tenetur. Nam odit totam cum suscipit excepturi, ipsum vero ex et minus temporibus commodi mollitia assumenda iure architecto repudiandae quasi nulla numquam animi doloremque. Distinctio quibusdam minima voluptas rem ab placeat incidunt! Reprehenderit nobis repellendus explicabo porro? Tenetur omnis asperiores, esse libero recusandae consequuntur. Eos illo, aperiam quibusdam ipsum tempore, laboriosam voluptatum impedit quasi exercitationem perferendis in, vitae optio? Adipisci eligendi eveniet deserunt nemo! Vero accusantium at quasi esse sequi tempore nobis veritatis! Illo fugit blanditiis provident itaque facere voluptatum eos nam, suscipit sequi nemo fugiat pariatur explicabo ratione labore soluta consectetur placeat autem assumenda reiciendis doloremque nulla? Repellendus voluptatum, dignissimos esse dolor ullam ducimus quam beatae, laudantium voluptates quasi consequatur minima quisquam incidunt eaque, praesentium deserunt corrupti. Voluptatem at in, quos, nihil eaque ratione adipisci totam aliquam molestiae ab cupiditate quis eius quae sunt fugiat dolore consectetur! Est a quaerat adipisci recusandae cumque? Eos, perspiciatis ipsam. Modi sed ipsum voluptate. Earum nulla dolore dolorum labore, dicta maiores odio libero ducimus consequatur quibusdam non suscipit harum doloremque inventore incidunt totam sunt reiciendis pariatur eius ab. Quibusdam placeat nulla voluptas, voluptatibus esse ab illo quis unde aspernatur earum architecto sapiente nobis tenetur dolor explicabo molestias, praesentium minima a alias tempora cupiditate. Mollitia nemo dolore, tenetur officiis odio autem, ut quisquam corporis amet, eius nesciunt earum repellat cum voluptatum architecto! Dolor blanditiis vero, accusantium eum expedita aperiam modi officiis minima similique corrupti rem molestiae officia eius, magni tempore quae quia error itaque aliquam facere? Provident alias reiciendis, recusandae eos corporis tempora nobis libero! Ipsam molestiae qui facilis quod ipsum magnam autem. Magnam ex assumenda quibusdam mollitia ad culpa dolor recusandae facilis ducimus tempora dicta, nobis veritatis doloremque tempore eos quos at hic ipsam corporis, quas neque eaque ea. Reiciendis consequatur voluptates enim libero deleniti quaerat dicta rerum aliquam ab tempora, incidunt placeat in velit natus aspernatur assumenda quidem nisi sequi mollitia dolor animi sunt ea. Quisquam nobis ea, illo laborum est impedit ipsa adipisci labore quaerat consequatur facilis sed necessitatibus id alias! Incidunt commodi accusamus voluptas aliquam, labore ducimus, modi laboriosam non culpa architecto perspiciatis dicta eaque! Placeat, quo. Voluptate consequuntur consequatur doloremque quas voluptas beatae accusantium recusandae placeat?
+// Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia perferendis sunt eos vero qui nostrum, et inventore unde molestiae at incidunt totam eaque aliquam, mollitia eum, dolore voluptatibus veritatis repellendus. Asperiores neque minus inventore, quas unde nisi illum ullam eius id officia atque modi amet qui nemo suscipit voluptate dicta, magnam fuga quibusdam. Voluptatem sint exercitationem doloremque nemo quo corporis tempore sed? Neque ab repellendus officia tempore aliquid mollitia, dignissimos culpa voluptatibus nisi odio fugiat, veniam inventore architecto cumque ea! Facilis repellat at, hic dignissimos mollitia perferendis fuga quisquam quos labore eum. Sapiente ipsa quidem voluptas eum consequatur dignissimos vitae dolorem dolore doloribus hic neque unde animi eius similique, asperiores tempore sunt. Quaerat officia eius,
