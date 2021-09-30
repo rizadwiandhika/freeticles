@@ -11,7 +11,7 @@
     max-width: 768px !important; /* max-w-screen-md */
   }
   .ql-editor p {
-    @apply text-base;
+    @apply text-base leading-7 text-gray-800;
   }
 }
 
