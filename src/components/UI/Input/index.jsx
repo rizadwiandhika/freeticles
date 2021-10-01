@@ -6,7 +6,7 @@ export default function Input(props) {
       {props.label && (
         <label
           htmlFor={props.name}
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-thin text-gray-400"
         >
           {props.label}
         </label>
@@ -21,7 +21,7 @@ export default function Input(props) {
         placeholder={props.placeholder || 'Placeholder...'}
         className={`${
           props.touched && props.err ? 'border-red-300' : 'border-gray-300'
-        } border mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm rounded-md`}
+        } border mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm rounded-md placeholder-gray-400`}
       />
       {props.touched && props.err && (
         <p className="mt-2 text-red-500 text-xs opacity-90">
