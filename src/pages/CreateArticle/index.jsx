@@ -9,6 +9,7 @@ import Navbar from '../../components/Navbar'
 import LabelRounded from '../../components/UI/LabelRounded'
 import { XIcon } from '@heroicons/react/outline'
 import Input from '../../components/UI/Input'
+import Tag from '../../components/UI/Tag'
 
 import loadingUpload from '../../assets/loading-upload.svg'
 import 'react-quill/dist/quill.snow.css'
@@ -50,6 +51,25 @@ export default function Index() {
     e.preventDefault?.()
     e.stopPropagation?.()
     setIsPublish((prev) => !prev)
+  }
+
+  // TODO: limit only 5 tags allowed
+  function handleAddTag(e) {
+    e.preventDefault()
+    const { tags } = articleMeta
+
+    setInputTag('')
+    if (tags.includes(inputTag)) return
+
+    setArticleMeta({
+      ...articleMeta,
+      tags: [...articleMeta.tags, inputTag]
+    })
+  }
+
+  function handleDeleteTag(name) {
+    const tags = articleMeta.tags.filter((tag) => tag !== name)
+    setArticleMeta({ ...articleMeta, tags })
   }
 
   // https://stackoverflow.com/questions/59825450/react-quill-custom-image-handler-module-causing-typing-issues-with-the-editor
@@ -107,6 +127,7 @@ export default function Index() {
 
                 // Insert uploaded image
                 quill.insertEmbed(range.index, 'image', url)
+                quill.setSelection(range.index + 1)
               }
             }
           }
@@ -187,31 +208,27 @@ export default function Index() {
                   Publisher: <strong>Riza Dwi Andhika</strong>
                 </h1>
                 <div className="mt-8 max-w-sm">
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      const { tags } = articleMeta
-
-                      setInputTag('')
-                      if (tags.includes((tag) => tag === inputTag)) return
-
-                      setArticleMeta({
-                        ...articleMeta,
-                        tags: [...articleMeta.tags, inputTag]
-                      })
-                    }}
-                  >
+                  <form onSubmit={handleAddTag}>
                     <Input
+                      // label="Input upto 5 tags..."
                       name="tag"
                       value={inputTag}
                       placeholder="Add tags..."
                       handleChange={(e) => setInputTag(e.target.value)}
                     />
+
                     <button type="submit" />
                   </form>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-4">
                     {articleMeta.tags.map((tag) => (
-                      <LabelRounded key={tag} text={tag} />
+                      <Tag px={2} key={tag} text={tag}>
+                        <XIcon
+                          onClick={() => handleDeleteTag(tag)}
+                          name={tag}
+                          className="ml-2 hover:cursor-pointer"
+                          height={16}
+                        />
+                      </Tag>
                     ))}
                   </div>
                 </div>
