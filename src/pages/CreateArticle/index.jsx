@@ -23,7 +23,7 @@ Link.sanitize = function (url) {
     : `http://${url}`
 }
 
-export default function Index() {
+export default function Index(props) {
   const [articleMeta, setArticleMeta] = useState({
     title: '',
     subtitle: '',
@@ -152,9 +152,13 @@ export default function Index() {
 
   return (
     <>
-      <Navbar>
-        <LabelRounded clicked={togglePreview} text="Preview" />
-        <LabelRounded clicked={togglePublish} blue text="Publish" />
+      <Navbar noSticky noShadow>
+        <LabelRounded
+          clicked={togglePreview}
+          theme="blue-invert"
+          text="Preview"
+        />
+        <LabelRounded clicked={togglePublish} theme="blue" text="Publish" />
       </Navbar>
 
       {/* Preview article */}
@@ -233,7 +237,7 @@ export default function Index() {
                   </div>
                 </div>
                 <div className="mt-8 w-36 font-bold">
-                  <LabelRounded blue text="Publish now" />
+                  <LabelRounded theme="blue" text="Publish now" />
                 </div>
               </div>
             </div>

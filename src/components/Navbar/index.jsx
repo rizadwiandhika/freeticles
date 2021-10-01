@@ -1,17 +1,18 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 import { UserCircleIcon, BookmarkIcon } from '@heroicons/react/outline'
 
 import LabelRounded from '../UI/LabelRounded'
 import Search from './Search'
 
-const mode = {
+const navbarItems = {
   notAuthenticated: (
     <>
       <Search />
       <p className="ml-4">
         <a href="/">Sign In</a>
       </p>
-      <LabelRounded blue text="Get started" />
+      <LabelRounded theme="blue" text="Get started" />
     </>
   ),
   authenticated: (
@@ -30,24 +31,61 @@ const mode = {
       <Search />
       <UserCircleIcon width="24px" className="text-gray-700" />
     </>
+  ),
+  notAuthenticatedSearch: (
+    <>
+      <Search />
+      <p className="ml-4">
+        <a href="/">Sign In</a>
+      </p>
+      <LabelRounded theme="blue" text="Get started" />
+    </>
+  ),
+  authenticatedSearch: (
+    <>
+      <Search />
+      <BookmarkIcon
+        width="24px"
+        className="text-gray-500"
+        // fill="white"
+      />
+      <UserCircleIcon width="24px" className="text-gray-500" />
+    </>
   )
 }
 
-export default function Navbar(props) {
-  const items = mode[props.mode]
-  // const items = mode.notAuthenticated
-
-  // Flex -> default jadi items-stretch
-  return (
-    <nav className="flex box-border h-16">
-      <div className="flex w-full max-w-6xl my-3 mx-6 md:mx-12 lg:mx-16 xl:mx-auto">
-        <div className="flex-grow flex-shrink-0">kanan</div>
+export default function Navbar({
+  mode = '',
+  noSticky = false,
+  noShadow = false,
+  children
+}) {
+  const items = navbarItems[mode]
+  const navbar = (
+    <nav
+      className={`flex box-border h-16 bg-white ${
+        noShadow ? '' : 'shadow-navbar-theme'
+      }`}
+    >
+      <div className="flex w-11/12 max-w-screen-xl my-3 mx-auto">
+        <div className="flex-grow flex-shrink-0 flex items-center">
+          <NavLink className="font-bold" to="/">
+            FREETICLES LOGO
+          </NavLink>
+        </div>
         <div className="flex-grow-0 flex-shrink-0 flex items-center gap-4">
-          {props.children}
+          {children}
           {items}
         </div>
       </div>
     </nav>
+  )
+
+  // Flex -> default jadi items-stretch
+  return noSticky ? (
+    navbar
+  ) : (
+    <div className="sticky z-50 top-0 left-0 right-0">{navbar}</div>
   )
 }
 
