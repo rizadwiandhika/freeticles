@@ -3,6 +3,34 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
+      colors: {
+        'gray-theme': {
+          DEFAULT: '#EFF3F4',
+          50: '#FFFFFF',
+          100: '#FFFFFF',
+          200: '#FFFFFF',
+          300: '#FFFFFF',
+          400: '#FFFFFF',
+          500: '#EFF3F4',
+          600: '#D1DCDF',
+          700: '#B3C6CA',
+          800: '#94AFB6',
+          900: '#7698A1'
+        },
+        'blue-theme': {
+          DEFAULT: '#029BF0',
+          50: '#D9F1FF',
+          100: '#C0E8FE',
+          200: '#8DD6FE',
+          300: '#5AC3FE',
+          400: '#28B1FD',
+          500: '#029BF0',
+          600: '#027ABD',
+          700: '#015A8B',
+          800: '#013958',
+          900: '#001826'
+        }
+      },
       typography: {
         DEFAULT: {
           css: {
