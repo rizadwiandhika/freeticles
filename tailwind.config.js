@@ -31,6 +31,9 @@ module.exports = {
           900: '#001826'
         }
       },
+      boxShadow: {
+        'navbar-theme': 'rgba(0, 0, 0, 0.05) 0px 4px 12px 0px'
+      },
       typography: {
         DEFAULT: {
           css: {
