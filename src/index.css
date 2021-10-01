@@ -13,6 +13,9 @@
   .ql-editor p {
     @apply text-base leading-7 text-gray-800;
   }
+  .ql-editor img {
+    @apply mx-auto object-scale-down;
+  }
 }
 
 @layer components {

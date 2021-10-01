@@ -55,7 +55,7 @@ module.exports = {
             img: {
               margin: 'auto',
               width: '100%',
-              objectFit: 'contains'
+              objectFit: 'scale-down'
             },
             a: {
               // color: '',
