@@ -8,15 +8,21 @@ const mode = {
   notAuthenticated: (
     <>
       <Search />
-      <p>Sign In</p>
+      <p className="ml-4">
+        <a href="/">Sign In</a>
+      </p>
       <LabelRounded blue text="Get started" />
     </>
   ),
   authenticated: (
     <>
       <Search />
-      <BookmarkIcon width="24px" fill="black" />
-      <UserCircleIcon width="24px" className="text-gray-700" />
+      <BookmarkIcon
+        width="24px"
+        className="text-gray-500"
+        // fill="white"
+      />
+      <UserCircleIcon width="24px" className="text-gray-500" />
     </>
   ),
   profile: (
@@ -29,10 +35,11 @@ const mode = {
 
 export default function Navbar(props) {
   const items = mode[props.mode]
+  // const items = mode.notAuthenticated
 
   // Flex -> default jadi items-stretch
   return (
-    <nav className="flex box-border h-16 bg-yellow-100">
+    <nav className="flex box-border h-16">
       <div className="flex w-full max-w-6xl my-3 mx-6 md:mx-12 lg:mx-16 xl:mx-auto">
         <div className="flex-grow flex-shrink-0">kanan</div>
         <div className="flex-grow-0 flex-shrink-0 flex items-center gap-4">
