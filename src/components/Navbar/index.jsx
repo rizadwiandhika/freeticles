@@ -34,7 +34,6 @@ const navbarItems = {
   ),
   notAuthenticatedSearch: (
     <>
-      <Search />
       <p className="ml-4">
         <a href="/">Sign In</a>
       </p>
@@ -43,7 +42,6 @@ const navbarItems = {
   ),
   authenticatedSearch: (
     <>
-      <Search />
       <BookmarkIcon
         width="24px"
         className="text-gray-500"
