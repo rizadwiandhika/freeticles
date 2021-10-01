@@ -10,6 +10,7 @@ import LabelRounded from '../../components/UI/LabelRounded'
 import { XIcon } from '@heroicons/react/outline'
 import Input from '../../components/UI/Input'
 
+import loadingUpload from '../../assets/loading-upload.svg'
 import 'react-quill/dist/quill.snow.css'
 
 // https://github.com/zenoamaro/react-quill/issues/529
@@ -87,7 +88,8 @@ export default function Index() {
                   range.index,
                   'image',
                   // `${window.location.origin}/images/loaders/placeholder.gif`
-                  'https://images.unsplash.com/photo-1607434472257-d9f8e57a643d?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=872&q=80'
+                  // 'https://images.unsplash.com/photo-1607434472257-d9f8e57a643d?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=872&q=80'
+                  loadingUpload
                 )
 
                 // Move cursor to right side of image (easier to continue typing)
