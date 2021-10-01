@@ -167,13 +167,13 @@ export default function Index() {
             />
             <div className="md:grid grid-cols-2 gap-x-16">
               <div className="md:col-span-1">
-                <h1 className="text-2xl font-bold">Story Preview</h1>
+                <h1 className="text-xl font-bold">Story Preview</h1>
                 <img
                   className="block my-8 max-h-72 object-cover"
                   src={findThumbnail(article)}
                   alt="thumbnail-article"
                 />
-                <h1 className="my-8 pb-2 border-b border-gray-300 text-2xl font-bold">
+                <h1 className="my-8 pb-2 border-b border-gray-300 text-xl font-bold">
                   {articleMeta.title}
                 </h1>
                 <h3 className="my-4 pb-2 border-b border-gray-300 text-base text-gray-400">
@@ -181,7 +181,7 @@ export default function Index() {
                 </h3>
               </div>
               <div className="md:col-span-1">
-                <h1 className="text-2xl">
+                <h1 className="text-xl">
                   Publisher: <strong>Riza Dwi Andhika</strong>
                 </h1>
                 <div className="mt-8 max-w-sm">
@@ -231,7 +231,7 @@ export default function Index() {
             handleChange={handleArticleMetaChange}
           />
         </div>
-        <div className="my-4">
+        <div className="mt-6">
           <Input
             name="subtitle"
             value={articleMeta.subtitle}
@@ -239,7 +239,7 @@ export default function Index() {
             handleChange={handleArticleMetaChange}
           />
         </div>
-        <div className="the-editor-container">
+        <div className="my-8 the-editor-container">
           <ReactQuill
             ref={quillRef}
             scrollingContainer=".the-editor-container"
