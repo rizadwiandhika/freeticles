@@ -1,7 +1,7 @@
 import React from 'react'
-import Navbar from '../../components/Navbar'
-import ArticleCard from '../../components/Article/ArticleCard'
-import LabelRounded from '../../components/UI/LabelRounded'
+import Navbar from '../components/Navbar'
+import ArticleCard from '../components/Article/ArticleCard'
+import LabelRounded from '../components/UI/LabelRounded'
 
 export default function Home(props) {
   return (

@@ -1,7 +1,7 @@
 import { Switch, Route } from 'react-router-dom'
 
-import CreateArticle from './pages/CreateArticle'
-import Home from './pages/Home'
+import CreateArticle from './pages/create-article'
+import Home from './pages'
 
 function App(props) {
   return (
