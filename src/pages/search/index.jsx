@@ -1,9 +1,27 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import queryString from 'query-string'
 import Navbar from '../../components/Navbar'
 import ArticleSearchCard from '../../components/Article/ArticleSearchCard'
 import LabelRounded from '../../components/UI/LabelRounded'
 
 export default function Search(props) {
+  const [query, setQuery] = useState('')
+
+  useEffect(() => {
+    console.log(props.location.search)
+    console.log(queryString.parse(props.location.search))
+  }, [props.location.search])
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    const searchQuery = queryString.stringify({ q: query })
+
+    props.history.push({
+      pathname: '/search',
+      search: searchQuery
+    })
+  }
+
   return (
     <>
       <Navbar mode="authenticatedSearch" noSticky />
@@ -12,12 +30,14 @@ export default function Search(props) {
         <div className="md:col-span-8 ">
           <div className="mt-12 ">
             <div className="flex gap-6 border-b border-gray-300">
-              <form className="w-full">
+              <form className="w-full" onSubmit={handleSubmit}>
                 <input
                   className="block w-full h-20 text-4xl placeholder-gray-400 border-none focus:outline-none focus:border-transparent focus:ring-transparent"
-                  type="text"
+                  onChange={(e) => setQuery(e.target.value)}
+                  value={query}
                   name="q"
                   id="q"
+                  type="text"
                   placeholder="Search freticles"
                 />
               </form>
