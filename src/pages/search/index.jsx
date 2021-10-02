@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import queryString from 'query-string'
+import qs from 'query-string'
 import Navbar from '../../components/Navbar'
 import ArticleSearchCard from '../../components/Article/ArticleSearchCard'
 import LabelRounded from '../../components/UI/LabelRounded'
@@ -8,18 +8,16 @@ export default function Search(props) {
   const [query, setQuery] = useState('')
 
   useEffect(() => {
-    console.log(props.location.search)
-    console.log(queryString.parse(props.location.search))
+    // TODO: search article based on query
+    const { q } = qs.parse(props.location.search)
+    setQuery(q)
   }, [props.location.search])
 
   function handleSubmit(e) {
     e.preventDefault()
-    const searchQuery = queryString.stringify({ q: query })
 
-    props.history.push({
-      pathname: '/search',
-      search: searchQuery
-    })
+    const searchQuery = qs.stringify({ q: query })
+    props.history.push({ pathname: '/search', search: searchQuery })
   }
 
   return (

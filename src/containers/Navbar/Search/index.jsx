@@ -10,9 +10,8 @@ export default function Search({ name, value, onChange, onSubmit }) {
   function handleSubmit(e) {
     e.preventDefault()
 
-    const url = { pathname: '/search', search: qs.stringify({ q: query }) }
-    console.log(url)
-    history.push(url)
+    const searchQuery = qs.stringify({ q: query })
+    history.push({ pathname: '/search', search: searchQuery })
   }
 
   function handleChange(e) {
