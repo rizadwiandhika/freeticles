@@ -4,13 +4,14 @@ import React from 'react'
 import Navbar from '../components/Navbar'
 import ArticleCard from '../components/Article/ArticleCard'
 import LabelRounded from '../components/UI/LabelRounded'
-import Search from '../components/Navbar/Search'
+import Search from '../containers/Navbar/Search'
 
 function Home(props) {
   return (
     <>
       <Navbar shadow>
         <Search />
+
         <p
           onClick={props.openOverlayLogin}
           className="hover:cursor-pointer ml-4"

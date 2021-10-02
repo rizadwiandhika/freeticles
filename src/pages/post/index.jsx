@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Navbar from '../../components/Navbar'
-import Search from '../../components/Navbar/Search'
+import Search from '../../containers/Navbar/Search'
 import Article from '../../components/Article'
 import ArticleBoxCard from '../../components/Article/ArticleBoxCard'
 import Comment from '../../components/Comment'

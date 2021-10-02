@@ -3,7 +3,7 @@ import { Switch, Route, Redirect, NavLink } from 'react-router-dom'
 import { UserCircleIcon } from '@heroicons/react/outline'
 
 import Navbar from '../../components/Navbar'
-import Search from '../../components/Navbar/Search'
+import Search from '../../containers/Navbar/Search'
 import ReadingList from './reading-list'
 import YourArticle from './your-article'
 

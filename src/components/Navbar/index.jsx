@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { UserCircleIcon, BookmarkIcon } from '@heroicons/react/outline'
 
 import LabelRounded from '../UI/LabelRounded'
-import Search from './Search'
+import Search from '../../containers/Navbar/Search'
 
 export default function Navbar({ sticky, shadow, children }) {
   const shadowStyle = shadow ? 'shadow-navbar-theme' : ''
