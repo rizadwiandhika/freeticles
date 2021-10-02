@@ -1,6 +1,7 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 
-const HASURA_GRAPHQL_ENDPOINT = 'https://graphql-todolist.hasura.app/v1/graphql'
+const HASURA_GRAPHQL_ENDPOINT =
+  'https://front-end-mini-project-alterra.hasura.app/v1/graphql'
 const PASSWORD = process.env.REACT_APP_HASURA_PASSWORD
 
 const client = new ApolloClient({
