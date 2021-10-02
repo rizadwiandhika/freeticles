@@ -1,12 +1,19 @@
+import React, { useEffect } from 'react'
+import bcrypt from 'bcryptjs'
 import withOverlay from '../hoc/withAuthOverlay'
-
-import React from 'react'
 import Navbar from '../components/Navbar'
 import ArticleCard from '../components/Article/ArticleCard'
 import LabelRounded from '../components/UI/LabelRounded'
 import Search from '../containers/Navbar/Search'
 
 function Home(props) {
+  useEffect(() => {
+    async function getHashedPassword() {
+      const result = await bcrypt.hash('riza123', 12)
+      console.log('encrypted', result)
+    }
+    getHashedPassword()
+  }, [])
   return (
     <>
       <Navbar shadow>
