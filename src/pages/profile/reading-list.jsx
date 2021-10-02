@@ -4,18 +4,10 @@ import ArticleCard from '../../components/Article/ArticleCard'
 export default function ReadingList(props) {
   return (
     <>
-      <div className="my-8">
-        <ArticleCard isReadingList />
-      </div>
-      <div className="my-8">
-        <ArticleCard isReadingList />
-      </div>
-      <div className="my-8">
-        <ArticleCard isReadingList />
-      </div>
-      <div className="my-8">
-        <ArticleCard isReadingList />
-      </div>
+      <ArticleCard className="my-8" isReadingList />
+      <ArticleCard className="my-8" isReadingList />
+      <ArticleCard className="my-8" isReadingList />
+      <ArticleCard className="my-8" isReadingList />
     </>
   )
 }

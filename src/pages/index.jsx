@@ -18,24 +18,12 @@ export default function Home(props) {
               </p>
             </div>
             <div className="mt-12">
-              <div>
-                <ArticleCard />
-              </div>
-              <div className="mt-12">
-                <ArticleCard />
-              </div>
-              <div className="mt-12">
-                <ArticleCard />
-              </div>
-              <div className="mt-12">
-                <ArticleCard />
-              </div>
-              <div className="mt-12">
-                <ArticleCard />
-              </div>
-              <div className="mt-12">
-                <ArticleCard />
-              </div>
+              <ArticleCard className="mt-12" />
+              <ArticleCard className="mt-12" />
+              <ArticleCard className="mt-12" />
+              <ArticleCard className="mt-12" />
+              <ArticleCard className="mt-12" />
+              <ArticleCard className="mt-12" />
             </div>
           </div>
         </div>
