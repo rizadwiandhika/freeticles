@@ -1,7 +1,7 @@
 import React from 'react'
 import { DotsVerticalIcon, BookmarkIcon } from '@heroicons/react/outline'
 
-export default function ArticleCard(props) {
+export default function ArticleCard({ isReadingList = false }) {
   return (
     <div className="flex h-40">
       <div className="p-2 w-full flex flex-col justify-between">
@@ -20,7 +20,11 @@ export default function ArticleCard(props) {
             Sep 6 • 8 min read • programing
           </p>
           <div className="mr-4 flex gap-1">
-            <BookmarkIcon className="hover:cursor-pointer" width={20} />
+            <BookmarkIcon
+              className="hover:cursor-pointer"
+              width={20}
+              fill={isReadingList ? 'black' : 'white'}
+            />
             <DotsVerticalIcon className="hover:cursor-pointer" width={20} />
           </div>
         </div>
