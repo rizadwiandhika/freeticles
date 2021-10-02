@@ -1,12 +1,28 @@
+import withOverlay from '../hoc/withAuthOverlay'
+
 import React from 'react'
 import Navbar from '../components/Navbar'
 import ArticleCard from '../components/Article/ArticleCard'
 import LabelRounded from '../components/UI/LabelRounded'
+import Search from '../components/Navbar/Search'
 
-export default function Home(props) {
+function Home(props) {
   return (
     <>
-      <Navbar mode="notAuthenticated" noSticky />
+      <Navbar shadow>
+        <Search />
+        <p
+          onClick={props.openOverlayLogin}
+          className="hover:cursor-pointer ml-4"
+        >
+          Sign In
+        </p>
+        <LabelRounded
+          onClick={props.openOverlayRegister}
+          theme="blue"
+          text="Get started"
+        />
+      </Navbar>
 
       <div className="w-11/12 max-w-screen-xl mx-auto md:grid md:grid-cols-12">
         <div className="md:col-span-8 ">
@@ -57,3 +73,5 @@ export default function Home(props) {
     </>
   )
 }
+
+export default withOverlay(Home)

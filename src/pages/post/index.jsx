@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Navbar from '../../components/Navbar'
+import Search from '../../components/Navbar/Search'
 import Article from '../../components/Article'
 import ArticleBoxCard from '../../components/Article/ArticleBoxCard'
 import Comment from '../../components/Comment'
@@ -37,7 +38,12 @@ export default function Post(props) {
 
   return (
     <>
-      <Navbar noSticky mode="notAuthenticated" />
+      <Navbar shadow>
+        <Search />
+        <p className="ml-4">SignIn</p>
+        <LabelRounded theme="blue" text="Get started" />
+      </Navbar>
+
       <div className="w-11/12 max-w-screen-xl mx-auto">
         <div className="max-w-screen-md my-12 mx-auto border-b border-gray-300">
           <Article

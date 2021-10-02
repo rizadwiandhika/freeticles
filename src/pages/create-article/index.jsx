@@ -152,7 +152,7 @@ export default function Index(props) {
 
   return (
     <>
-      <Navbar noSticky noShadow>
+      <Navbar>
         <LabelRounded
           clicked={togglePreview}
           theme="blue-invert"

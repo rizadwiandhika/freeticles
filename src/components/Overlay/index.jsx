@@ -3,12 +3,17 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/outline'
 
 // ! props.children dari overlay harus relative supaya
-export default function Overlay(props) {
+export default function Overlay({
+  isOpen,
+  closeOverlay,
+  noOverlayBackdrop,
+  children
+}) {
   return (
-    <Transition show={props.isOpen} as={Fragment}>
-      <Dialog onClose={props.closeOverlay}>
+    <Transition show={isOpen} as={Fragment}>
+      <Dialog onClose={closeOverlay}>
         <div className="fixed z-20 inset-0 min-h-screen overflow-y-auto">
-          {props.noOverlayBackdrop || (
+          {noOverlayBackdrop || (
             <Dialog.Overlay className="fixed inset-0 bg-black opacity-30 " />
           )}
 
@@ -20,7 +25,7 @@ export default function Overlay(props) {
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0" */
           >
-            {props.children}
+            {children}
           </Transition.Child>
         </div>
       </Dialog>

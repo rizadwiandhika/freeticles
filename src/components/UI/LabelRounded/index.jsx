@@ -29,7 +29,7 @@ export default function LabelRounded(props) {
 
   return (
     <div
-      onClick={props.clicked}
+      onClick={props.onClick}
       className={`hover:cursor-pointer min-w-min flex justify-center box-border items-center rounded-3xl border ${px} ${py} ${color} ${bgColor} ${borderColor}`}
     >
       {props.text}

@@ -1,6 +1,9 @@
 import React from 'react'
 import { Switch, Route, Redirect, NavLink } from 'react-router-dom'
+import { UserCircleIcon } from '@heroicons/react/outline'
+
 import Navbar from '../../components/Navbar'
+import Search from '../../components/Navbar/Search'
 import ReadingList from './reading-list'
 import YourArticle from './your-article'
 
@@ -9,7 +12,11 @@ export default function Profile(props) {
 
   return (
     <>
-      <Navbar noSticky mode="authenticated" />
+      <Navbar shadow>
+        <Search />
+        <UserCircleIcon width="24px" className="text-gray-700" />
+      </Navbar>
+
       <div className="w-11/12 max-w-screen-xl mx-auto">
         <div className="my-16 mx-auto max-w-screen-md">
           <div className="my-8 flex gap-8 border-b border-gray-300 ">

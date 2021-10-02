@@ -24,7 +24,10 @@ export default function Search(props) {
 
   return (
     <>
-      <Navbar mode="authenticatedSearch" noSticky />
+      <Navbar shadow>
+        <p className="ml-4">Sign In</p>
+        <LabelRounded theme="blue" text="Get started" />
+      </Navbar>
 
       <div className="w-11/12 max-w-screen-xl mx-auto md:grid md:grid-cols-12">
         <div className="md:col-span-8 ">
