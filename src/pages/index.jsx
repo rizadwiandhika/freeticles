@@ -1,4 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useState } from 'react'
+import { NavLink, Redirect } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { BookmarkIcon, UserCircleIcon } from '@heroicons/react/outline'
 import withOverlay from '../hoc/withAuthOverlay'
 import Navbar from '../components/Navbar'
 import ArticleCard from '../components/Article/ArticleCard'
@@ -6,29 +9,68 @@ import LabelRounded from '../components/UI/LabelRounded'
 import Search from '../containers/Navbar/Search'
 
 function Home(props) {
-  /* useEffect(() => {
-    async function getHashedPassword() {
-      const result = await bcrypt.hash('riza123', 12)
-      console.log('encrypted', result)
+  const user = useSelector((state) => state.user)
+  const isAuth = user.username && user.password
+
+  function handleClickSignIn() {
+    props.openOverlayLogin()
+    props.setLoginCallback()
+    props.setRegisterCallback()
+  }
+
+  function handleClickGetStarted(e) {
+    props.openOverlayRegister()
+    props.setLoginCallback()
+    props.setRegisterCallback()
+  }
+
+  function handleClickStartWriting() {
+    if (isAuth) return props.history.push('/create-article')
+
+    function callback(err) {
+      if (err) return
+      props.history.push('/create-article')
     }
-    getHashedPassword()
-  }, []) */
+
+    props.openOverlayLogin()
+    props.setLoginCallback(callback)
+    props.setRegisterCallback(callback)
+  }
+
   return (
     <>
       <Navbar shadow>
         <Search />
-
-        <p
-          onClick={props.openOverlayLogin}
-          className="hover:cursor-pointer ml-4"
-        >
-          Sign In
-        </p>
-        <LabelRounded
-          onClick={props.openOverlayRegister}
-          theme="blue"
-          text="Get started"
-        />
+        {isAuth ? (
+          <>
+            <NavLink to="/profile/reading-list">
+              <BookmarkIcon
+                width={24}
+                className="hover:cursor-pointer text-gray-500"
+              />
+            </NavLink>
+            <UserCircleIcon
+              width={24}
+              className="hover:cursor-pointer text-gray-500"
+            />
+          </>
+        ) : (
+          <>
+            <p
+              onClick={handleClickSignIn}
+              className="hover:cursor-pointer ml-4 text-sm"
+            >
+              Sign In
+            </p>
+            <div className="text-sm">
+              <LabelRounded
+                onClick={handleClickGetStarted}
+                theme="blue"
+                text="Get started"
+              />
+            </div>
+          </>
+        )}
       </Navbar>
 
       <div className="w-11/12 max-w-screen-xl mx-auto md:grid md:grid-cols-12">
@@ -71,7 +113,13 @@ function Home(props) {
                 You can start share article to million readres
               </p>
               <div className="mt-4 min-w-max w-12 mx-auto">
-                <LabelRounded py={2} px={8} theme="blue" text="Start Writing" />
+                <LabelRounded
+                  onClick={handleClickStartWriting}
+                  py={2}
+                  px={8}
+                  theme="blue"
+                  text="Start Writing"
+                />
               </div>
             </div>
           </div>

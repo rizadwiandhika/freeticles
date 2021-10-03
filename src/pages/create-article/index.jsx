@@ -154,11 +154,11 @@ export default function Index(props) {
     <>
       <Navbar>
         <LabelRounded
-          clicked={togglePreview}
+          onClick={togglePreview}
           theme="blue-invert"
           text="Preview"
         />
-        <LabelRounded clicked={togglePublish} theme="blue" text="Publish" />
+        <LabelRounded onClick={togglePublish} theme="blue" text="Publish" />
       </Navbar>
 
       {/* Preview article */}
