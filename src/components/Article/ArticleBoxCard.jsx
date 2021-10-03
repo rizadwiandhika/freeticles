@@ -40,7 +40,7 @@ async function getMeta(url, callback) {
   }
 }
 
-getMeta(
-  'https://miro.medium.com/fit/c/200/134/1*VRAXxJJjOcC0Bk_bEM3eEw.png',
-  (width, height) => console.log(width, height)
-)
+// getMeta(
+//   'https://miro.medium.com/fit/c/200/134/1*VRAXxJJjOcC0Bk_bEM3eEw.png',
+//   (width, height) => console.log(width, height)
+// )
