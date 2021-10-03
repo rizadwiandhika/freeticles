@@ -10,6 +10,7 @@ export default function UnderlineInput({
   return (
     <div className={className}>
       <input
+        autoComplete="off"
         type={type}
         name={name}
         value={value}
