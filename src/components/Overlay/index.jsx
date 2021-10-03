@@ -1,6 +1,5 @@
 import React, { Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { XIcon } from '@heroicons/react/outline'
 
 // ! props.children dari overlay harus relative supaya
 export default function Overlay({
@@ -12,18 +11,24 @@ export default function Overlay({
   return (
     <Transition show={isOpen} as={Fragment}>
       <Dialog onClose={closeOverlay}>
-        <div className="fixed z-20 inset-0 min-h-screen overflow-y-auto">
-          {noOverlayBackdrop || (
-            <Dialog.Overlay className="fixed inset-0 bg-black opacity-30 " />
-          )}
+        <div className="fixed  z-20 inset-0 min-h-screen overflow-y-auto">
+          <Transition.Child
+            leave="transition duration-200 ease-out"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            {noOverlayBackdrop || (
+              <Dialog.Overlay className="fixed inset-0 bg-white opacity-90 " />
+            )}
+          </Transition.Child>
 
           <Transition.Child
-            enter="transition duration-100 ease-out"
+            enter="transition duration-300 ease-out"
             enterFrom="transform scale-90 opacity-0"
             enterTo="transform scale-100 opacity-100"
-            /* leave="transition duration-75 ease-out"
-            leaveFrom="transform scale-100 opacity-100"
-            leaveTo="transform scale-95 opacity-0" */
+            leave="transition duration-200 ease-out"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
             {children}
           </Transition.Child>
