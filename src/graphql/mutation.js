@@ -10,11 +10,13 @@ import { gql } from '@apollo/client'
 }
 */
 const INSERT_ONE_USER = gql`
-  mutation InsertOneUser($data: users_insert_input!) {
-    insert_users_one(object: $data) {
+  mutation InsertOneUser($user: users_insert_input!) {
+    insert_users_one(object: $user) {
       name
       password
       username
     }
   }
 `
+
+export { INSERT_ONE_USER }

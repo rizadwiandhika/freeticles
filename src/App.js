@@ -1,3 +1,4 @@
+import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import Profile from './pages/profile'
@@ -7,6 +8,8 @@ import CreateArticle from './pages/create-article'
 import Home from './pages'
 
 function App(props) {
+  // * Ngga butuh authenticate in the first-place karena
+  // * localStorage udah auto masuk ke redux
   return (
     <Switch>
       <Route path="/profile" component={Profile} />

@@ -6,12 +6,19 @@ import reportWebVitals from './reportWebVitals'
 import client from './graphql'
 import { ApolloProvider } from '@apollo/client'
 import { BrowserRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { store, persistor } from './store'
+import { PersistGate } from 'redux-persist/integration/react'
 
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <BrowserRouter>
-        <App />
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <App />
+          </PersistGate>
+        </Provider>
       </BrowserRouter>
     </ApolloProvider>
   </React.StrictMode>,

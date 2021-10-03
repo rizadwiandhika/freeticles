@@ -1,12 +1,101 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import bcrypt from 'bcryptjs'
+import { useSelector, useDispatch } from 'react-redux'
+import { useQuery, useMutation } from '@apollo/client'
+
+import { GET_USER_BY_USERNAME } from '../graphql/query'
+import { INSERT_ONE_USER } from '../graphql/mutation'
+import { saveUser } from '../store/user'
 import UnderlineInput from '../components/UI/Input/UnderlineInput'
 import Overlay from '../components/Overlay'
 import LabelRounded from '../components/UI/LabelRounded'
 
 export default function withAuthOverlay(Component) {
   return function (props) {
+    const dispatch = useDispatch()
+    const user = useSelector((store) => store.user)
+
     const [isOpen, setIsOpen] = useState(false)
     const [view, setView] = useState('login')
+    const [userInput, setUserInput] = useState({
+      name: '',
+      username: '',
+      password: ''
+    })
+
+    const { refetch } = useQuery(GET_USER_BY_USERNAME)
+    const [insertOneUser, insertOneUserInfo] = useMutation(INSERT_ONE_USER)
+
+    /* const { loading, data, error } = useQuery(GET_USER_BY_USERNAME, {
+      variables: { username: 'something' }
+    })
+
+    useEffect(() => {
+      if (loading) return
+      if (error) {
+        console.error(error)
+        return
+      }
+
+      console.log(data)
+    }, [loading, data, error, dispatch]) */
+
+    function handleInputChange(e) {
+      const { name, value } = e.target
+      setUserInput({ ...userInput, [name]: value })
+    }
+
+    async function handleRegisterSubmit(e) {
+      const newUser = { ...userInput }
+
+      try {
+        const SALT = 12
+        newUser.password = await bcrypt.hash(newUser.password, SALT)
+      } catch (error) {
+        return console.error(error)
+      }
+
+      await insertOneUser({ variables: { user: newUser } })
+
+      if (insertOneUserInfo.error) {
+        return console.error(insertOneUserInfo.error)
+      }
+
+      dispatch(saveUser(userInput))
+      setIsOpen(false)
+      alert('register success!')
+    }
+
+    async function handleLoginSubmit(e) {
+      const SALT = 12
+      let isValid = false
+      let fetchedUser = null
+
+      try {
+        const response = await refetch({ username: userInput.username })
+        fetchedUser = response.data.users_by_pk
+      } catch (error) {
+        return console.error('something wrong with refetching...', error)
+      }
+
+      if (!fetchedUser) {
+        return alert('incorrect username or password')
+      }
+
+      try {
+        isValid = await bcrypt.compare(userInput.password, fetchedUser.password)
+      } catch (error) {
+        return console.error(error)
+      }
+
+      if (!isValid) {
+        return alert('incorrect username or password')
+      }
+
+      const { name, username } = fetchedUser
+      dispatch(saveUser({ name, username, password: userInput.password }))
+      alert('login success')
+    }
 
     function closeOverlay() {
       setIsOpen(false)
@@ -48,6 +137,7 @@ export default function withAuthOverlay(Component) {
           openOverlayRegister={openOverlayRegister}
           {...props}
         />
+
         <Overlay isOpen={isOpen} closeOverlay={closeOverlay}>
           <div className="relative mx-auto max-w-screen-sm bg-white min-h-screen">
             <div className="h-screen flex justify-center items-center">
@@ -62,7 +152,9 @@ export default function withAuthOverlay(Component) {
                     <div className="my-8">
                       <p className="text-center text-sm">Your fullname</p>
                       <UnderlineInput
-                        name="fullname"
+                        onChange={handleInputChange}
+                        value={userInput.name}
+                        name="name"
                         className="my-4 pb-1 text-center border-b border-gray-300"
                       />
                     </div>
@@ -71,6 +163,7 @@ export default function withAuthOverlay(Component) {
                   <div className="my-8">
                     <p className="text-center text-sm">Username</p>
                     <UnderlineInput
+                      onChange={handleInputChange}
                       name="username"
                       className="my-4 pb-1 text-center border-b border-gray-300"
                     />
@@ -79,6 +172,8 @@ export default function withAuthOverlay(Component) {
                   <div className="my-8">
                     <p className="text-center text-sm">Password</p>
                     <UnderlineInput
+                      onChange={handleInputChange}
+                      type="password"
                       name="password"
                       className="my-4  pb-1 border-b border-gray-300"
                     />
@@ -87,7 +182,15 @@ export default function withAuthOverlay(Component) {
 
                 <div>
                   <div className="w-48 mx-auto">
-                    <LabelRounded theme="black" text={label} />
+                    <LabelRounded
+                      onClick={
+                        view === 'login'
+                          ? handleLoginSubmit
+                          : handleRegisterSubmit
+                      }
+                      theme="black"
+                      text={label}
+                    />
                   </div>
                   <p className="mt-8 text-center">
                     {footer1}{' '}
