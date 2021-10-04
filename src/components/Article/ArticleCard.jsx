@@ -12,7 +12,7 @@ export default function ArticleCard({ className, data, isBookmarked = false }) {
     <div className={className}>
       <div className="flex h-40">
         <div className="p-2 w-full flex flex-col justify-between">
-          <NavLink to="/post">
+          <NavLink to={`/post/${data.articleId}`}>
             <p className="text-sm">{data?.username || 'Hernowo ari'}</p>
             <h1 className="mt-2 text-xl font-bold">
               {data?.title || '21 Best Practices for a Clean React Project'}
@@ -47,7 +47,10 @@ export default function ArticleCard({ className, data, isBookmarked = false }) {
           </div>
         </div>
 
-        <NavLink to="/post" className="flex items-center w-72">
+        <NavLink
+          to={`/post/${data.articleId}`}
+          className="flex items-center w-72"
+        >
           <img
             className="block w-full h-36 object-cover"
             src={data?.thumbnail}

@@ -12,8 +12,8 @@ function App(props) {
   // * localStorage udah auto masuk ke redux
   return (
     <Switch>
+      <Route path="/post/:id" component={Post} />
       <Route path="/profile" component={Profile} />
-      <Route path="/post" component={Post} />
       <Route path="/create-article" component={CreateArticle} />
       <Route path="/search" component={Search} />
       <Route exact path="/" component={Home} />
