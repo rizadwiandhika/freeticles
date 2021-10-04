@@ -178,7 +178,6 @@ export default function withAuthOverlay(Component) {
         ? 'Enter your username and password'
         : 'Enter your username and password to create an account'
 
-    console.log('overlay render')
     return (
       <>
         <Component

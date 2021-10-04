@@ -6,7 +6,13 @@ import { DotsVerticalIcon, BookmarkIcon } from '@heroicons/react/outline'
 
 import MenuDropdown from '../UI/MenuDropdown'
 
-const defaultArticleMeta = { title: '', subtitle: '', author: '' }
+const defaultArticleMeta = {
+  title: '',
+  subtitle: '',
+  username: '',
+  publishDate: '',
+  readingTime: ''
+}
 
 export default function Article({
   articleMeta = defaultArticleMeta,
@@ -23,8 +29,8 @@ export default function Article({
 
       <div className="mt-8 flex justify-between">
         <div>
-          <p>{articleMeta.author || '<Author name>'}</p>
-          <p>{'20 Sep • 3 mins read'}</p>
+          <p>{articleMeta.username || '<Author name>'}</p>
+          <p>{`${articleMeta.publishDate} • ${articleMeta.readingTime}`}</p>
         </div>
         <div className={`flex gap-1 ${isPreview ? 'invisible' : ''}`}>
           <BookmarkIcon

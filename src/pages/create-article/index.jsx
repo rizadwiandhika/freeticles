@@ -1,8 +1,11 @@
 import React, { useState, useRef, useMemo } from 'react'
+import { useSelector } from 'react-redux'
+import rt from 'reading-time'
 import ReactQuill from 'react-quill'
 import Quill from 'quill'
+import { useMutation } from '@apollo/client'
+import { INSERT_ONE_ARTICLE, INSERT_TAGS } from '../../graphql/mutation'
 import { uploadImage } from '../../firebase'
-
 import Article from '../../components/Article'
 import Overlay from '../../components/Overlay'
 import Navbar from '../../components/Navbar'
@@ -24,16 +27,25 @@ Link.sanitize = function (url) {
 }
 
 export default function Index(props) {
+  const user = useSelector((state) => state.user)
   const [articleMeta, setArticleMeta] = useState({
+    username: user.username,
     title: '',
     subtitle: '',
-    tags: []
+    tags: [],
+    publishDate: new Date().toISOString().split('T')[0],
+    readingTime: ''
   })
   const [article, setArticle] = useState('')
   const [inputTag, setInputTag] = useState('')
   const [isPreview, setIsPreview] = useState(false)
   const [isPublish, setIsPublish] = useState(false)
   const [invalidTitle, setInvalidTitle] = useState(false)
+  const [publishLoading, setPublishLoading] = useState(false)
+  const [publishError, setPublishError] = useState(false)
+
+  const [insertArticle] = useMutation(INSERT_ONE_ARTICLE)
+  const [insertTags] = useMutation(INSERT_TAGS)
 
   const quillRef = useRef(null)
 
@@ -47,7 +59,11 @@ export default function Index(props) {
   function togglePreview(e) {
     e.preventDefault?.()
     e.stopPropagation?.()
+
+    const readingTime = rt(article).text
+
     setIsPreview((prev) => !prev)
+    setArticleMeta({ ...articleMeta, readingTime })
   }
 
   function togglePublish(e) {
@@ -75,6 +91,35 @@ export default function Index(props) {
   function handleDeleteTag(name) {
     const tags = articleMeta.tags.filter((tag) => tag !== name)
     setArticleMeta({ ...articleMeta, tags })
+  }
+
+  async function handlePublish() {
+    const { tags: articleTags, ...articleData } = articleMeta
+
+    articleData.content = article
+    articleData.thumbnail = findThumbnail(article)
+    articleData.publishDate = new Date().toISOString().split('T')[0]
+
+    try {
+      setPublishError(false)
+      setPublishLoading(true)
+
+      let result = await insertArticle({ variables: { articleData } })
+      const { articleId } = result.data.insert_articles_one
+
+      const tags = articleTags.map((tag) => ({ tagName: tag, articleId }))
+      result = await insertTags({ variables: { tags } })
+
+      console.log(result.data.insert_articleTags)
+      alert('berhasil')
+      props.history.push('/profile/your-article')
+    } catch (error) {
+      console.error(error)
+      alert('error')
+      setPublishError(true)
+    } finally {
+      setPublishLoading(false)
+    }
   }
 
   // https://stackoverflow.com/questions/59825450/react-quill-custom-image-handler-module-causing-typing-issues-with-the-editor
@@ -244,8 +289,16 @@ export default function Index(props) {
                   </div>
                 </div>
                 <div className="mt-8 w-36 font-bold">
-                  <LabelRounded theme="blue" text="Publish now" />
+                  <LabelRounded
+                    onClick={handlePublish}
+                    theme={publishLoading ? 'gray' : 'blue'}
+                    text={publishLoading ? 'Publishing...' : 'Publish now'}
+                  />
                 </div>
+
+                <p className="mt-8 text-red-500 opacity-80">
+                  Publishing failed... Try again.
+                </p>
               </div>
             </div>
           </div>
