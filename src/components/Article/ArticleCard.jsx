@@ -1,6 +1,7 @@
 import React from 'react'
-import MenuDropdown from '../UI/MenuDropdown'
 import { DotsVerticalIcon, BookmarkIcon } from '@heroicons/react/outline'
+import { NavLink } from 'react-router-dom'
+import MenuDropdown from '../UI/MenuDropdown'
 
 export default function ArticleCard({ className, data, isBookmarked = false }) {
   console.log(data?.articleTags)
@@ -11,13 +12,13 @@ export default function ArticleCard({ className, data, isBookmarked = false }) {
     <div className={className}>
       <div className="flex h-40">
         <div className="p-2 w-full flex flex-col justify-between">
-          <div>
+          <NavLink to="/post">
             <p className="text-sm">{data?.username || 'Hernowo ari'}</p>
             <h1 className="mt-2 text-xl font-bold">
               {data?.title || '21 Best Practices for a Clean React Project'}
             </h1>
             <h3 className="text-gray-500">{data?.subtitle}</h3>
-          </div>
+          </NavLink>
 
           <div className="flex justify-between">
             <p className="text-sm text-gray-500">
@@ -46,13 +47,13 @@ export default function ArticleCard({ className, data, isBookmarked = false }) {
           </div>
         </div>
 
-        <div className="flex items-center w-72">
+        <NavLink to="/post" className="flex items-center w-72">
           <img
             className="block w-full h-36 object-cover"
             src={data?.thumbnail}
             alt="article thumbnail"
           />
-        </div>
+        </NavLink>
       </div>
     </div>
   )
