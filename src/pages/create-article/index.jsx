@@ -97,6 +97,7 @@ export default function Index(props) {
     const { tags: articleTags, ...articleData } = articleMeta
 
     articleData.content = article
+    articleData.readingTime = rt(article).text
     articleData.thumbnail = findThumbnail(article)
     articleData.publishDate = new Date().toISOString().split('T')[0]
 
@@ -290,13 +291,17 @@ export default function Index(props) {
                 </div>
                 <div className="mt-8 w-36 font-bold">
                   <LabelRounded
-                    onClick={handlePublish}
+                    onClick={publishLoading ? null : handlePublish}
                     theme={publishLoading ? 'gray' : 'blue'}
                     text={publishLoading ? 'Publishing...' : 'Publish now'}
                   />
                 </div>
 
-                <p className="mt-8 text-red-500 opacity-80">
+                <p
+                  className={`mt-8 text-red-500 opacity-80 ${
+                    publishError ? 'visible' : 'invisible'
+                  }`}
+                >
                   Publishing failed... Try again.
                 </p>
               </div>
@@ -343,9 +348,12 @@ export default function Index(props) {
 }
 
 function findThumbnail(article) {
-  const imageTagRegex = /<img src=".*">/
+  const imageTagRegex = /<img([\w\W]+?)>/
   const urlRegex = /".*"/
   return article?.match(imageTagRegex)?.[0]?.match(urlRegex)?.[0]?.slice(1, -1)
+  // const imageTagRegex = /<img src=".*">/
+  // const urlRegex = /".*"/
+  // return article?.match(imageTagRegex)?.[0]?.match(urlRegex)?.[0]?.slice(1, -1)
 }
 
 /* 
