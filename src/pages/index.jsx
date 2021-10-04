@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { useLazyQuery, useQuery } from '@apollo/client'
+import { GET_ARTICLES } from '../graphql/query'
 import withOverlay from '../hoc/withAuthOverlay'
 import Navbar from '../components/Navbar'
 import DefaultNavItems from '../components/Navbar/Items/DefaultNavItems'
@@ -7,9 +9,12 @@ import ArticleCard from '../components/Article/ArticleCard'
 import LabelRounded from '../components/UI/LabelRounded'
 import NavSearch from '../containers/Navbar/NavSearch'
 
+import loadingFetch from '../assets/loading-fetch.svg'
+
 function Home(props) {
   const user = useSelector((state) => state.user)
   const isAuth = user.username && user.password
+  const { loading, data, error } = useQuery(GET_ARTICLES)
 
   function handleClickSignIn() {
     props.openOverlayLogin()
@@ -40,6 +45,10 @@ function Home(props) {
     props.history.push(`/search?q=${query}`)
   }
 
+  if (error) {
+    console.error(error)
+  }
+
   return (
     <>
       <Navbar shadow>
@@ -61,12 +70,24 @@ function Home(props) {
               </p>
             </div>
             <div className="mt-12">
+              {loading && (
+                <img
+                  className="block mx-auto"
+                  src={loadingFetch}
+                  alt="loading pic"
+                />
+              )}
+
+              {data?.articles.map((article) => (
+                <ArticleCard className="mt-12" data={article} />
+              ))}
+
+              {/* <ArticleCard className="mt-12" />
               <ArticleCard className="mt-12" />
               <ArticleCard className="mt-12" />
               <ArticleCard className="mt-12" />
               <ArticleCard className="mt-12" />
-              <ArticleCard className="mt-12" />
-              <ArticleCard className="mt-12" />
+              <ArticleCard className="mt-12" /> */}
             </div>
           </div>
         </div>
