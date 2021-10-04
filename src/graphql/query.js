@@ -37,4 +37,32 @@ const GET_ARTICLES = gql`
   }
 `
 
-export { GET_USERS, GET_USER_BY_USERNAME, GET_ARTICLES }
+const GET_ARTICLE_BY_ID = gql`
+  query GetArticleById($articleId: Int!) {
+    articles_by_pk(articleId: $articleId) {
+      content
+      publishDate
+      readingTime
+      subtitle
+      thumbnail
+      title
+      username
+      articleTags {
+        tagName
+      }
+      articleId
+      comments {
+        commentar
+        username
+        commentId
+      }
+      likes_aggregate {
+        aggregate {
+          count(columns: likeId)
+        }
+      }
+    }
+  }
+`
+
+export { GET_USERS, GET_USER_BY_USERNAME, GET_ARTICLES, GET_ARTICLE_BY_ID }

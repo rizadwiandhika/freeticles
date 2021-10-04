@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { useQuery } from '@apollo/client'
+import { GET_ARTICLE_BY_ID } from '../../graphql/query'
 import Navbar from '../../components/Navbar'
 import NavSearch from '../../containers/Navbar/NavSearch'
 import Article from '../../components/Article'
@@ -14,6 +16,11 @@ import {
 } from '@heroicons/react/outline'
 
 export default function Post(props) {
+  const { loading, data, error } = useQuery(GET_ARTICLE_BY_ID, {
+    variables: {
+      articleId: props.match.params.articleId
+    }
+  })
   const [isShowComments, setIsShowComments] = useState(false)
   const [isShowCommentButton, setIsShowCommentButton] = useState(false)
   const [comment, setComment] = useState('')
@@ -36,6 +43,10 @@ export default function Post(props) {
     setIsShowComments((prev) => !prev)
   }
 
+  if (loading) return 'loading'
+  if (error) return 'error'
+
+  console.log(data?.articles_by_pk)
   return (
     <>
       <Navbar shadow>
@@ -46,14 +57,8 @@ export default function Post(props) {
 
       <div className="w-11/12 max-w-screen-xl mx-auto">
         <div className="max-w-screen-md my-12 mx-auto border-b border-gray-300">
-          <Article
-            articleMeta={{
-              title: 'The snowballing',
-              subtitle: 'What the f...',
-              author: 'anonim'
-            }}
-            article={lorem500}
-          />
+          <Article data={data.articles_by_pk} />
+
           <div className="mt-12 flex flex-wrap gap-4">
             <Tag px={2} text="Mantapp" />
             <Tag px={2} text="Asalole" />

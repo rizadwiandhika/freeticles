@@ -2,6 +2,7 @@ import React from 'react'
 import { DotsVerticalIcon, BookmarkIcon } from '@heroicons/react/outline'
 import { NavLink } from 'react-router-dom'
 import MenuDropdown from '../UI/MenuDropdown'
+import { getDateFormat } from '../../utils'
 
 export default function ArticleCard({ className, data, isBookmarked = false }) {
   console.log(data?.articleTags)
@@ -60,33 +61,4 @@ export default function ArticleCard({ className, data, isBookmarked = false }) {
       </div>
     </div>
   )
-}
-
-function getDateFormat(date) {
-  if (!date) return ''
-
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ]
-  const current = new Date()
-  let [year, month, day] = date.split('-')
-  year = +year
-  month = +month
-  day = +day
-
-  let formatDate = `${day} ${monthNames[month]}`
-
-  if (year < current.getFullYear()) formatDate = `${formatDate}, ${year}`
-  return formatDate
 }
