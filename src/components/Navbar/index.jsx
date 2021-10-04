@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { UserCircleIcon, BookmarkIcon } from '@heroicons/react/outline'
 
 import LabelRounded from '../UI/LabelRounded'
-import Search from '../../containers/Navbar/Search'
+import NavSearch from '../../containers/Navbar/NavSearch'
 
 export default function Navbar({ sticky, shadow, children }) {
   const shadowStyle = shadow ? 'shadow-navbar-theme' : ''
@@ -35,7 +35,7 @@ function getNavbarItems({ name, payload }) {
     case 'notAuthenticated':
       return (
         <>
-          <Search />
+          <NavSearch />
           <p
             onClick={payload.openOverlay}
             className="hover:cursor-pointer ml-4"
@@ -49,7 +49,7 @@ function getNavbarItems({ name, payload }) {
     case 'authenticated':
       return (
         <>
-          <Search />
+          <NavSearch />
           <BookmarkIcon
             width="24px"
             className="text-gray-500"
@@ -62,7 +62,7 @@ function getNavbarItems({ name, payload }) {
     case 'profile':
       return (
         <>
-          <Search />
+          <NavSearch />
           <UserCircleIcon width="24px" className="text-gray-700" />
         </>
       )

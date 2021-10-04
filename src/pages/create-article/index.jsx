@@ -33,12 +33,15 @@ export default function Index(props) {
   const [inputTag, setInputTag] = useState('')
   const [isPreview, setIsPreview] = useState(false)
   const [isPublish, setIsPublish] = useState(false)
+  const [invalidTitle, setInvalidTitle] = useState(false)
 
   const quillRef = useRef(null)
 
   function handleArticleMetaChange(e) {
     const { name, value } = e.target
     setArticleMeta({ ...articleMeta, [name]: value })
+
+    if (name === 'title') setInvalidTitle(false)
   }
 
   function togglePreview(e) {
@@ -50,6 +53,8 @@ export default function Index(props) {
   function togglePublish(e) {
     e.preventDefault?.()
     e.stopPropagation?.()
+
+    if (!articleMeta.title) return setInvalidTitle(true)
     setIsPublish((prev) => !prev)
   }
 
@@ -174,7 +179,7 @@ export default function Index(props) {
               className="absolute right-2 transform -translate-y-12 hover:cursor-pointer"
               width={24}
             />
-            <Article articleMeta={articleMeta} article={article} />
+            <Article isPreview articleMeta={articleMeta} article={article} />
           </div>
         </div>
       </Overlay>
@@ -212,9 +217,11 @@ export default function Index(props) {
                   Publisher: <strong>Riza Dwi Andhika</strong>
                 </h1>
                 <div className="mt-8 max-w-sm">
+                  <p className="my-4 text-gray-500 text-sm">
+                    Add up to five tags for your article
+                  </p>
                   <form onSubmit={handleAddTag}>
                     <Input
-                      // label="Input upto 5 tags..."
                       name="tag"
                       value={inputTag}
                       placeholder="Add tags..."
@@ -252,9 +259,11 @@ export default function Index(props) {
             value={articleMeta.title}
             placeholder="Title..."
             handleChange={handleArticleMetaChange}
+            err={invalidTitle}
+            errMessage="Article should have a title"
           />
         </div>
-        <div className="mt-6">
+        <div className="mt-4">
           <Input
             name="subtitle"
             value={articleMeta.subtitle}

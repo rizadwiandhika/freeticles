@@ -1,17 +1,45 @@
 import React, { useState, useEffect } from 'react'
 import qs from 'query-string'
+
 import Navbar from '../../components/Navbar'
+import DefaultNavItems from '../../components/Navbar/Items/DefaultNavItems'
 import ArticleSearchCard from '../../components/Article/ArticleSearchCard'
 import LabelRounded from '../../components/UI/LabelRounded'
+import { useSelector } from 'react-redux'
+import withAuthOverlay from '../../hoc/withAuthOverlay'
 
-export default function Search(props) {
+function Search(props) {
   const [query, setQuery] = useState('')
+  const user = useSelector((state) => state.user)
+  const isAuth = user.username && user.password
+
+  useEffect(() => {
+    function callback(err) {
+      if (err) return
+      props.closeOverlay()
+    }
+
+    props.setLoginCallback(callback)
+    props.setRegisterCallback(callback)
+  }, [])
 
   useEffect(() => {
     // TODO: search article based on query
     const { q } = qs.parse(props.location.search)
     setQuery(q)
   }, [props.location.search])
+
+  /* function handleClickSignIn() {
+    props.openOverlayLogin()
+    props.setLoginCallback()
+    props.setRegisterCallback()
+  }
+
+  function handleClickGetStarted(e) {
+    props.openOverlayRegister()
+    props.setLoginCallback()
+    props.setRegisterCallback()
+  } */
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -20,11 +48,18 @@ export default function Search(props) {
     props.history.push({ pathname: '/search', search: searchQuery })
   }
 
+  function handleLabelClick(query) {
+    props.history.push(`/search?q=${query}`)
+  }
+
   return (
     <>
       <Navbar shadow>
-        <p className="ml-4">Sign In</p>
-        <LabelRounded theme="blue" text="Get started" />
+        <DefaultNavItems
+          isAuth={isAuth}
+          handleClickGetStarted={props.openOverlayRegister}
+          handleClickSignIn={props.openOverlayLogin}
+        />
       </Navbar>
 
       <div className="w-11/12 max-w-screen-xl mx-auto md:grid md:grid-cols-12">
@@ -43,25 +78,13 @@ export default function Search(props) {
                 />
               </form>
             </div>
-            <div className="mt-12">
-              <div>
-                <ArticleSearchCard />
-              </div>
-              <div className="mt-12">
-                <ArticleSearchCard />
-              </div>
-              <div className="mt-12">
-                <ArticleSearchCard />
-              </div>
-              <div className="mt-12">
-                <ArticleSearchCard />
-              </div>
-              <div className="mt-12">
-                <ArticleSearchCard />
-              </div>
-              <div className="mt-12">
-                <ArticleSearchCard />
-              </div>
+            <div>
+              <ArticleSearchCard className="mt-12" />
+              <ArticleSearchCard className="mt-12" />
+              <ArticleSearchCard className="mt-12" />
+              <ArticleSearchCard className="mt-12" />
+              <ArticleSearchCard className="mt-12" />
+              <ArticleSearchCard className="mt-12" />
             </div>
           </div>
         </div>
@@ -70,14 +93,46 @@ export default function Search(props) {
           <div className="mt-12 sticky top-0 w-full">
             <p className="pb-2 font-bold ">Tags</p>
             <div className="flex flex-wrap gap-4 mt-4 text-sm">
-              <LabelRounded theme="gray" text="Programming" />
-              <LabelRounded theme="gray" text="TV" />
-              <LabelRounded theme="gray" text="Book" />
-              <LabelRounded theme="gray" text="Guitar" />
-              <LabelRounded theme="gray" text="Self" />
-              <LabelRounded theme="gray" text="Mindfulness" />
-              <LabelRounded theme="gray" text="Lifestyle" />
-              <LabelRounded theme="gray" text="React JS" />
+              <LabelRounded
+                onClick={() => handleLabelClick('Programming')}
+                theme="gray"
+                text="Programming"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('TV')}
+                theme="gray"
+                text="TV"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Book')}
+                theme="gray"
+                text="Book"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Guitar')}
+                theme="gray"
+                text="Guitar"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Self')}
+                theme="gray"
+                text="Self"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Mindfulness')}
+                theme="gray"
+                text="Mindfulness"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Lifestyle')}
+                theme="gray"
+                text="Lifestyle"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('React JS')}
+                theme="gray"
+                text="React JS"
+              />
             </div>
           </div>
         </div>
@@ -85,3 +140,5 @@ export default function Search(props) {
     </>
   )
 }
+
+export default withAuthOverlay(Search)

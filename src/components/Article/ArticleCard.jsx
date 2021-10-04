@@ -1,7 +1,8 @@
 import React from 'react'
+import MenuDropdown from '../UI/MenuDropdown'
 import { DotsVerticalIcon, BookmarkIcon } from '@heroicons/react/outline'
 
-export default function ArticleCard({ className, isReadingList = false }) {
+export default function ArticleCard({ className, isBookmarked = false }) {
   return (
     <div className={className}>
       <div className="flex h-40">
@@ -23,10 +24,22 @@ export default function ArticleCard({ className, isReadingList = false }) {
             <div className="mr-4 flex gap-1">
               <BookmarkIcon
                 className="hover:cursor-pointer"
-                width={20}
-                fill={isReadingList ? 'black' : 'white'}
+                width="1.2rem"
+                fill={isBookmarked ? 'black' : 'white'}
               />
-              <DotsVerticalIcon className="hover:cursor-pointer" width={20} />
+
+              <MenuDropdown>
+                <DotsVerticalIcon
+                  className="hover:cursor-pointer"
+                  width="1.2rem"
+                />
+
+                <>
+                  <li className="my-4 text-gray-500 hover:cursor-pointer hover:text-black ">
+                    Report article
+                  </li>
+                </>
+              </MenuDropdown>
             </div>
           </div>
         </div>

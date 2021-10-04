@@ -1,20 +1,26 @@
 import React from 'react'
 import { Switch, Route, Redirect, NavLink } from 'react-router-dom'
-import { UserCircleIcon } from '@heroicons/react/outline'
+import { useSelector } from 'react-redux'
 
 import Navbar from '../../components/Navbar'
-import Search from '../../containers/Navbar/Search'
+import NavSearch from '../../containers/Navbar/NavSearch'
+import AvatarItem from '../../components/Navbar/Items/Item/AvatarItem'
 import ReadingList from './reading-list'
 import YourArticle from './your-article'
 
 export default function Profile(props) {
-  // TODO: if not authenticated -> redirect to home
+  const user = useSelector((state) => state.user)
+  const isAuth = user.username && user.password
+
+  if (!isAuth) {
+    return <Redirect to="/" />
+  }
 
   return (
     <>
       <Navbar shadow>
-        <Search />
-        <UserCircleIcon width="24px" className="text-gray-700" />
+        <NavSearch />
+        <AvatarItem />
       </Navbar>
 
       <div className="w-11/12 max-w-screen-xl mx-auto">

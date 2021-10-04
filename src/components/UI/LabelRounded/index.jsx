@@ -19,20 +19,27 @@ const colorMap = {
   black: { text: 'text-white', bg: 'bg-black', border: 'border-black' }
 }
 
-export default function LabelRounded(props) {
-  const px = props.px ? `px-${props.px}` : 'px-4'
-  const py = props.py ? `py-${props.py}` : 'py-1'
+export default function LabelRounded({
+  className,
+  theme,
+  onClick,
+  px,
+  py,
+  text
+}) {
+  const paddingX = px ? `px-${px}` : 'px-4'
+  const paddingY = py ? `py-${py}` : 'py-1'
 
-  const color = colorMap[props.theme]?.text
-  const bgColor = colorMap[props.theme]?.bg
-  const borderColor = colorMap[props.theme]?.border
+  const color = colorMap[theme]?.text
+  const bgColor = colorMap[theme]?.bg
+  const borderColor = colorMap[theme]?.border
 
   return (
     <div
-      onClick={props.onClick}
-      className={`hover:cursor-pointer min-w-min flex justify-center box-border items-center rounded-3xl border ${px} ${py} ${color} ${bgColor} ${borderColor}`}
+      onClick={onClick}
+      className={`hover:cursor-pointer min-w-min flex justify-center box-border items-center rounded-3xl border ${paddingX} ${paddingY} ${color} ${bgColor} ${borderColor}`}
     >
-      {props.text}
+      <p className={className}>{text}</p>
     </div>
   )
 }

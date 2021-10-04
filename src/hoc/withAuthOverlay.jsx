@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import bcrypt from 'bcryptjs'
 import { useDispatch } from 'react-redux'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery, useLazyQuery, useMutation } from '@apollo/client'
 import { XIcon } from '@heroicons/react/outline'
 
 import { GET_USER_BY_USERNAME } from '../graphql/query'
@@ -34,6 +34,7 @@ export default function withAuthOverlay(Component) {
     })
 
     const { refetch } = useQuery(GET_USER_BY_USERNAME)
+    // const [lazy, { refetch }] = useLazyQuery(GET_USER_BY_USERNAME)
     const [insertOneUser, insertOneUserInfo] = useMutation(INSERT_ONE_USER)
 
     async function handleRegisterSubmit(e) {
@@ -98,6 +99,7 @@ export default function withAuthOverlay(Component) {
 
         // TODO: popup label persegi panjang di pokok kiri bawah layar
       } catch (err) {
+        console.log(err)
         loginError = err.message
         switch (err.message) {
           case 'not found':
@@ -176,6 +178,7 @@ export default function withAuthOverlay(Component) {
         ? 'Enter your username and password'
         : 'Enter your username and password to create an account'
 
+    console.log('overlay render')
     return (
       <>
         <Component

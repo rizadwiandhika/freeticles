@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Navbar from '../../components/Navbar'
-import Search from '../../containers/Navbar/Search'
+import NavSearch from '../../containers/Navbar/NavSearch'
 import Article from '../../components/Article'
 import ArticleBoxCard from '../../components/Article/ArticleBoxCard'
 import Comment from '../../components/Comment'
@@ -39,7 +39,7 @@ export default function Post(props) {
   return (
     <>
       <Navbar shadow>
-        <Search />
+        <NavSearch />
         <p className="ml-4">SignIn</p>
         <LabelRounded theme="blue" text="Get started" />
       </Navbar>

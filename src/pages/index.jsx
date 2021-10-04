@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
-import { NavLink, Redirect } from 'react-router-dom'
+import React from 'react'
 import { useSelector } from 'react-redux'
-import { BookmarkIcon, UserCircleIcon } from '@heroicons/react/outline'
 import withOverlay from '../hoc/withAuthOverlay'
 import Navbar from '../components/Navbar'
+import DefaultNavItems from '../components/Navbar/Items/DefaultNavItems'
 import ArticleCard from '../components/Article/ArticleCard'
 import LabelRounded from '../components/UI/LabelRounded'
-import Search from '../containers/Navbar/Search'
+import NavSearch from '../containers/Navbar/NavSearch'
 
 function Home(props) {
   const user = useSelector((state) => state.user)
@@ -37,40 +36,19 @@ function Home(props) {
     props.setRegisterCallback(callback)
   }
 
+  function handleLabelClick(query) {
+    props.history.push(`/search?q=${query}`)
+  }
+
   return (
     <>
       <Navbar shadow>
-        <Search />
-        {isAuth ? (
-          <>
-            <NavLink to="/profile/reading-list">
-              <BookmarkIcon
-                width={24}
-                className="hover:cursor-pointer text-gray-500"
-              />
-            </NavLink>
-            <UserCircleIcon
-              width={24}
-              className="hover:cursor-pointer text-gray-500"
-            />
-          </>
-        ) : (
-          <>
-            <p
-              onClick={handleClickSignIn}
-              className="hover:cursor-pointer ml-4 text-sm"
-            >
-              Sign In
-            </p>
-            <div className="text-sm">
-              <LabelRounded
-                onClick={handleClickGetStarted}
-                theme="blue"
-                text="Get started"
-              />
-            </div>
-          </>
-        )}
+        <NavSearch />
+        <DefaultNavItems
+          isAuth={isAuth}
+          handleClickGetStarted={handleClickGetStarted}
+          handleClickSignIn={handleClickSignIn}
+        />
       </Navbar>
 
       <div className="w-11/12 max-w-screen-xl mx-auto md:grid md:grid-cols-12">
@@ -97,14 +75,46 @@ function Home(props) {
           <div className="mt-12 sticky top-0 w-full">
             <p className="pb-2 font-bold ">Recommended topics</p>
             <div className="flex flex-wrap gap-4 mt-4 text-sm">
-              <LabelRounded theme="gray" text="Programming" />
-              <LabelRounded theme="gray" text="TV" />
-              <LabelRounded theme="gray" text="Book" />
-              <LabelRounded theme="gray" text="Guitar" />
-              <LabelRounded theme="gray" text="Self" />
-              <LabelRounded theme="gray" text="Mindfulness" />
-              <LabelRounded theme="gray" text="Lifestyle" />
-              <LabelRounded theme="gray" text="React JS" />
+              <LabelRounded
+                onClick={() => handleLabelClick('Programming')}
+                theme="gray"
+                text="Programming"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('TV')}
+                theme="gray"
+                text="TV"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Book')}
+                theme="gray"
+                text="Book"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Guitar')}
+                theme="gray"
+                text="Guitar"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Self')}
+                theme="gray"
+                text="Self"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Mindfulness')}
+                theme="gray"
+                text="Mindfulness"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('Lifestyle')}
+                theme="gray"
+                text="Lifestyle"
+              />
+              <LabelRounded
+                onClick={() => handleLabelClick('React JS')}
+                theme="gray"
+                text="React JS"
+              />
             </div>
 
             <div className="mt-12">
@@ -114,6 +124,7 @@ function Home(props) {
               </p>
               <div className="mt-4 min-w-max w-12 mx-auto">
                 <LabelRounded
+                  className="text-sm"
                   onClick={handleClickStartWriting}
                   py={2}
                   px={8}
