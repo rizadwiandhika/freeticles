@@ -20,4 +20,21 @@ const GET_USER_BY_USERNAME = gql`
   }
 `
 
-export { GET_USERS, GET_USER_BY_USERNAME }
+const GET_ARTICLES = gql`
+  query GetArticles {
+    articles(limit: 20) {
+      articleId
+      title
+      thumbnail
+      subtitle
+      username
+      readingTime
+      publishDate
+      articleTags {
+        tagName
+      }
+    }
+  }
+`
+
+export { GET_USERS, GET_USER_BY_USERNAME, GET_ARTICLES }
