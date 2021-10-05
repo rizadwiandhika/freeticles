@@ -1,8 +1,18 @@
-import React, { useState } from 'react'
-import { useQuery } from '@apollo/client'
+import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { useQuery, useMutation } from '@apollo/client'
 import { GET_ARTICLE_BY_ID } from '../../graphql/query'
+import {
+  INSERT_ONE_COMMENT,
+  INSERT_ONE_LIKE,
+  DELETE_LIKE_BY_ID
+} from '../../graphql/mutation'
+import { logout } from '../../store/user'
+import useDebouce from '../../hooks/useDebounce'
+import withAuthOverlay from '../../hoc/withAuthOverlay'
 import Navbar from '../../components/Navbar'
 import NavSearch from '../../containers/Navbar/NavSearch'
+import DefaultNavItems from '../../components/Navbar/Items/DefaultNavItems'
 import Article from '../../components/Article'
 import ArticleBoxCard from '../../components/Article/ArticleBoxCard'
 import Comment from '../../components/Comment'
@@ -15,22 +25,93 @@ import {
   DotsVerticalIcon
 } from '@heroicons/react/outline'
 
-export default function Post(props) {
-  const { loading, data, error } = useQuery(GET_ARTICLE_BY_ID, {
+function Post(props) {
+  const dispatch = useDispatch()
+  const user = useSelector((state) => state.user)
+  const isAuth = user.username && user.password
+  const {
+    loading,
+    data: rawData,
+    error
+  } = useQuery(GET_ARTICLE_BY_ID, {
+    fetchPolicy: 'network-only', // Doesn't check cache before making a network request
     variables: {
-      articleId: props.match.params.articleId
+      articleId: props.match.params.articleId,
+      username: user.username
     }
   })
+  const [insertOneComment] = useMutation(INSERT_ONE_COMMENT)
+  // const [deleteLikeById] = useMutation(DELETE_LIKE_BY_ID)
+
+  // const [isLiked, setIsLiked] = useState(false)
+  // const [isBookmarked, setIsBookmarked] = useState(false)
+  const [tempComments, setTempComments] = useState([])
   const [isShowComments, setIsShowComments] = useState(false)
   const [isShowCommentButton, setIsShowCommentButton] = useState(false)
-  const [comment, setComment] = useState('')
+  const [inputComment, setInputComment] = useState({
+    value: '',
+    loading: false,
+    errorMsg: ''
+  })
 
-  function handleSubmit(e) {
+  // const isLikedDebounced = useDebouce(isLiked, 300)
+
+  // useEffect(() => {
+  //   if (loading || error) return
+
+  //   setIsLiked(rawData.articles_by_pk.likes.length > 0)
+  //   setIsBookmarked(rawData.articles_by_pk.bookmarks.length > 0)
+  // }, [loading, rawData, error])
+
+  // useEffect(() => {
+  //   async function handleLike() {
+  //     const data = rawData?.articles_by_pk
+  //     const isLiked = data.likes.length > 0
+
+  //     try {
+  //       if (isLikedDebounced) {
+  //         const likeId = data.likes[0].likeId
+  //         await deleteLikeById(likeId)
+  //       } else {
+
+  //       }
+  //     } catch (error) {}
+  //   }
+  //   handleLike()
+  // }, [isLikedDebounced])
+
+  // function handleClickLike() {
+  //   setIsLiked((prev) => !prev)
+  // }
+
+  async function handleSubmit(e) {
     e.preventDefault()
-    setComment('')
+
+    const commentData = {
+      articleId: props.match.params.articleId,
+      username: user.username,
+      date: new Date().toISOString().split('T')[0],
+      commentar: inputComment.value
+    }
+
+    setInputComment({ ...inputComment, loading: true })
+
+    try {
+      await insertOneComment({ variables: { comment: commentData } })
+      setTempComments((prev) => [...prev, commentData])
+      setInputComment({ value: '', loading: false, errorMsg: '' })
+    } catch (error) {
+      console.error(error)
+      alert('error')
+      setInputComment({
+        ...inputComment,
+        loading: false,
+        errorMsg: 'Comment upload failed!'
+      })
+    }
   }
   function handleInputChange(e) {
-    setComment(e.target.value)
+    setInputComment({ ...inputComment, value: e.target.value })
   }
   function handleInputFocus() {
     if (isShowCommentButton) return
@@ -43,21 +124,51 @@ export default function Post(props) {
     setIsShowComments((prev) => !prev)
   }
 
-  if (loading) return 'loading'
-  if (error) return 'error'
+  function handleClickSignIn() {
+    props.openOverlayLogin()
+    props.setLoginCallback()
+    props.setRegisterCallback()
+  }
+  function handleClickGetStarted() {
+    props.openOverlayRegister()
+    props.setLoginCallback()
+    props.setRegisterCallback()
+  }
+  function handleClickLogout() {
+    dispatch(logout())
+  }
 
-  console.log(data?.articles_by_pk)
+  if (loading) return null
+  if (error) {
+    console.error(error)
+    return 'error'
+  }
+
+  const data = rawData?.articles_by_pk
+
+  const likes = data?.likes_aggregate?.aggregate?.count
+  const articleComments = data?.comments
+
+  const isLiked = rawData.articles_by_pk.likes.length > 0
+  const isBookmarked = rawData.articles_by_pk.bookmarks.length > 0
+  const bookmarkIconFill = isBookmarked ? 'black' : 'white'
+  const likeIconFill = isLiked ? 'black' : 'white'
+
   return (
     <>
       <Navbar shadow>
         <NavSearch />
-        <p className="ml-4">SignIn</p>
-        <LabelRounded theme="blue" text="Get started" />
+        <DefaultNavItems
+          isAuth={isAuth}
+          handleClickGetStarted={handleClickGetStarted}
+          handleClickSignIn={handleClickSignIn}
+          handleClickLogout={handleClickLogout}
+        />
       </Navbar>
 
       <div className="w-11/12 max-w-screen-xl mx-auto">
         <div className="max-w-screen-md my-12 mx-auto border-b border-gray-300">
-          <Article data={data.articles_by_pk} />
+          <Article isBookmarked={isBookmarked} isLiked={isLiked} data={data} />
 
           <div className="mt-12 flex flex-wrap gap-4">
             <Tag px={2} text="Mantapp" />
@@ -69,8 +180,12 @@ export default function Post(props) {
           <div className="mt-8 pb-8 flex justify-between">
             <div className="flex gap-6">
               <div className="flex items-center gap-1">
-                <ThumbUpIcon className="hover:cursor-pointer" width={24} />
-                <span>23</span>
+                <ThumbUpIcon
+                  fill={likeIconFill}
+                  className="hover:cursor-pointer"
+                  width={24}
+                />
+                <span>{likes}</span>
               </div>
               <div className="flex items-center gap-1">
                 <ChatIcon
@@ -78,12 +193,20 @@ export default function Post(props) {
                   className="hover:cursor-pointer"
                   width={24}
                 />
-                <span>5</span>
+                <span>
+                  {articleComments
+                    ? articleComments.length + tempComments.length
+                    : 0 + tempComments.length}
+                </span>
               </div>
             </div>
 
             <div className="mr-4 flex gap-1">
-              <BookmarkIcon className="hover:cursor-pointer" width={24} />
+              <BookmarkIcon
+                fill={bookmarkIconFill}
+                className="hover:cursor-pointer"
+                width={24}
+              />
               <DotsVerticalIcon className="hover:cursor-pointer" width={24} />
             </div>
           </div>
@@ -96,7 +219,7 @@ export default function Post(props) {
                     className="block w-full text-base placeholder-gray-400 border-none focus:ring-transparent"
                     onChange={handleInputChange}
                     onFocus={handleInputFocus}
-                    value={comment}
+                    value={inputComment.value}
                     name="q"
                     id="q"
                     type="text"
@@ -113,15 +236,30 @@ export default function Post(props) {
                 <div onClick={handleHideCommentButton} className="w-24">
                   <LabelRounded py={2} text="Cancel" theme="blue-invert" />
                 </div>
-                <div className="w-24">
-                  <LabelRounded py={2} text="Comment" theme="blue" />
+                <div
+                  onClick={inputComment.loading ? null : handleSubmit}
+                  className="w-24"
+                >
+                  <LabelRounded
+                    py={2}
+                    text={inputComment.loading ? 'Uploading...' : 'Comment'}
+                    theme={inputComment.loading ? 'gray' : 'blue'}
+                  />
                 </div>
               </div>
 
               <div className="mt-8">
-                <Comment className="my-8" />
-                <Comment className="my-8" />
-                <Comment className="my-8" />
+                {tempComments.map((c, index) => (
+                  <Comment
+                    key={index}
+                    username={user.username}
+                    commentData={c}
+                    className="my-8"
+                  />
+                ))}
+                {articleComments.map((c) => (
+                  <Comment key={c.commentId} commentData={c} className="my-8" />
+                ))}
               </div>
             </div>
           )}
@@ -138,5 +276,4 @@ export default function Post(props) {
   )
 }
 
-const lorem500 =
-  'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea odit molestias nulla nostrum, quisquam consequatur id non cupiditate dicta voluptate fugit laboriosam beatae distinctio, nihil, ducimus exercitationem praesentium eum tenetur quo. Iusto iure amet doloremque ipsam aliquam possimus sit deleniti quo, dignissimos perspiciatis, a voluptas ut! Ullam dignissimos quod consectetur nihil necessitatibus atque quas autem, neque praesentium eligendi soluta eum optio officiis ad delectus eos voluptatibus inventore culpa ut qui iure. Nihil error reiciendis commodi, vitae distinctio vero, neque repudiandae, beatae consequuntur quis voluptas dolore. Nobis veniam placeat magnam suscipit maxime culpa, autem totam. Hic accusamus porro, eligendi molestiae sed corrupti harum necessitatibus saepe quis autem voluptatum, voluptatem ratione numquam delectus eveniet blanditiis accusantium. Mollitia nihil sint veniam numquam omnis doloremque adipisci tenetur in delectus error provident facilis, corporis atque placeat beatae obcaecati vitae voluptates asperiores culpa eligendi perspiciatis! Quibusdam facere accusamus harum impedit quasi, dolor recusandae, numquam commodi consectetur expedita repellendus dicta fuga fugiat tempora facilis! Voluptatum maiores doloremque sint hic quaerat natus velit enim odit commodi alias iste, temporibus quisquam corporis ea consequuntur qui voluptas. Blanditiis maxime, dolores nihil molestiae cum exercitationem mollitia cupiditate facilis aperiam, maiores ab enim quod repudiandae unde nesciunt perspiciatis autem harum error amet. Labore ut culpa iure officia, nobis sint in quod recusandae quo mollitia accusamus accusantium fuga laborum corrupti numquam ab aspernatur qui officiis nisi fugit? Quod voluptatem expedita debitis quibusdam libero ipsum vitae eius itaque officiis asperiores, atque fugiat aperiam eos doloribus similique iure quis corrupti rerum culpa soluta labore distinctio maxime error odit! Eius inventore repellat pariatur tempore et esse molestiae nemo veniam. Impedit in suscipit exercitationem tenetur inventore quam reprehenderit repudiandae odit. Aliquam maxime officiis modi illo placeat deleniti harum, recusandae excepturi quasi. Pariatur quos nemo asperiores et nostrum, quas ratione earum, culpa tempore praesentium rem officia voluptas ullam eaque sunt nesciunt voluptatibus fuga laborum. Ullam, provident accusantium incidunt iste ratione architecto voluptate eaque pariatur consequuntur quaerat culpa placeat voluptas consequatur. Nihil, perspiciatis! Tenetur assumenda incidunt, architecto sint fugit itaque necessitatibus illo culpa sapiente nesciunt magni cum consequuntur, harum voluptatibus ex animi dolorum veniam excepturi totam aliquid? Harum minima veritatis ipsam ab, laudantium ipsa non laboriosam rem earum corporis necessitatibus tenetur saepe dicta quod ipsum tempora maxime cum voluptates iusto molestiae dolore dignissimos fugit doloribus voluptatibus? Minus dolor sint animi alias praesentium cumque impedit? Saepe, porro nemo soluta atque error quae quo quam? Ducimus, atque accusamus iusto doloribus voluptatibus ut sequi eaque eos sit nihil perspiciatis eligendi a placeat? Distinctio illum velit ad. Quidem, ea voluptatibus? Deserunt, laborum? Animi minima officia voluptates? Aspernatur, nulla possimus ad modi alias a harum porro, distinctio ducimus, eveniet tempora commodi. Quas at repudiandae eius illum sed laudantium! Commodi ducimus tenetur quisquam dolor possimus sunt, modi totam consequuntur, hic veritatis unde non pariatur. Vitae perferendis, libero aperiam debitis necessitatibus harum iure inventore fugit dolore ullam eos modi placeat ab incidunt minus accusamus natus obcaecati cum praesentium laboriosam illum quis! Fugiat provident repudiandae ut. Assumenda, necessitatibus! Omnis eum architecto accusamus adipisci consequuntur beatae fugit culpa.'
+export default withAuthOverlay(Post)

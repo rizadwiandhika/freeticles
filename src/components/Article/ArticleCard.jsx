@@ -5,7 +5,6 @@ import MenuDropdown from '../UI/MenuDropdown'
 import { getDateFormat } from '../../utils'
 
 export default function ArticleCard({ className, data, isBookmarked = false }) {
-  console.log(data?.articleTags)
   const date = getDateFormat(data?.publishDate)
   const tag = data?.articleTags[0].tagName
 

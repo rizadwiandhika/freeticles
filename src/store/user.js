@@ -46,6 +46,9 @@ const slice = createSlice({
       state.username = username
       state.password = password
     },
+    logout: function (state, action) {
+      return initialState
+    },
     changed: function (state, action) {
       const { name, value } = action.payload
 
@@ -81,7 +84,7 @@ const slice = createSlice({
 })
 
 export default slice.reducer
-export const { saveUser } = slice.actions
+export const { saveUser, logout } = slice.actions
 
 export function insertUsers({ name, password }) {
   return async function (dispatch) {}

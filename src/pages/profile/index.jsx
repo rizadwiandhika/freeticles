@@ -1,7 +1,7 @@
 import React from 'react'
 import { Switch, Route, Redirect, NavLink } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-
+import { useSelector, useDispatch } from 'react-redux'
+import { logout } from '../../store/user'
 import Navbar from '../../components/Navbar'
 import NavSearch from '../../containers/Navbar/NavSearch'
 import AvatarItem from '../../components/Navbar/Items/Item/AvatarItem'
@@ -9,6 +9,7 @@ import ReadingList from './reading-list'
 import YourArticle from './your-article'
 
 export default function Profile(props) {
+  const dispatch = useDispatch()
   const user = useSelector((state) => state.user)
   const isAuth = user.username && user.password
 
@@ -16,11 +17,15 @@ export default function Profile(props) {
     return <Redirect to="/" />
   }
 
+  function handleClickLogout() {
+    dispatch(logout())
+  }
+
   return (
     <>
       <Navbar shadow>
         <NavSearch />
-        <AvatarItem />
+        <AvatarItem handleClickLogout={handleClickLogout} />
       </Navbar>
 
       <div className="w-11/12 max-w-screen-xl mx-auto">

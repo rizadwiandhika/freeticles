@@ -6,12 +6,13 @@ import LabelRounded from '../../UI/LabelRounded'
 export default function DefaultNavItems({
   isAuth,
   handleClickSignIn,
-  handleClickGetStarted
+  handleClickGetStarted,
+  handleClickLogout
 }) {
   const navItems = isAuth ? (
     <>
       <BookmarkItem />
-      <AvatarItem />
+      <AvatarItem handleClickLogout={handleClickLogout} />
     </>
   ) : (
     <>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { logout } from '../store/user'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { GET_ARTICLES } from '../graphql/query'
 import withOverlay from '../hoc/withAuthOverlay'
@@ -12,20 +13,30 @@ import NavSearch from '../containers/Navbar/NavSearch'
 import loadingFetch from '../assets/loading-fetch.svg'
 
 function Home(props) {
+  const dispatch = useDispatch()
   const user = useSelector((state) => state.user)
   const isAuth = user.username && user.password
   const { loading, data, error } = useQuery(GET_ARTICLES)
 
-  function handleClickSignIn() {
-    props.openOverlayLogin()
-    props.setLoginCallback()
-    props.setRegisterCallback()
+  function afterAuthCallback(err) {
+    if (err) return
+    props.closeOverlay()
   }
 
-  function handleClickGetStarted(e) {
+  function handleClickSignIn() {
+    props.openOverlayLogin()
+    props.setLoginCallback(afterAuthCallback)
+    props.setRegisterCallback(afterAuthCallback)
+  }
+
+  function handleClickGetStarted() {
     props.openOverlayRegister()
-    props.setLoginCallback()
-    props.setRegisterCallback()
+    props.setLoginCallback(afterAuthCallback)
+    props.setRegisterCallback(afterAuthCallback)
+  }
+
+  function handleClickLogout() {
+    dispatch(logout())
   }
 
   function handleClickStartWriting() {
@@ -57,6 +68,7 @@ function Home(props) {
           isAuth={isAuth}
           handleClickGetStarted={handleClickGetStarted}
           handleClickSignIn={handleClickSignIn}
+          handleClickLogout={handleClickLogout}
         />
       </Navbar>
 
@@ -79,7 +91,11 @@ function Home(props) {
               )}
 
               {data?.articles.map((article) => (
-                <ArticleCard className="mt-12" data={article} />
+                <ArticleCard
+                  key={article.articleId}
+                  className="mt-12"
+                  data={article}
+                />
               ))}
 
               {/* <ArticleCard className="mt-12" />

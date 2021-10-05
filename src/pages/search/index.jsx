@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import qs from 'query-string'
-
+import { useSelector, useDispatch } from 'react-redux'
+import { logout } from '../../store/user'
 import Navbar from '../../components/Navbar'
 import DefaultNavItems from '../../components/Navbar/Items/DefaultNavItems'
 import ArticleSearchCard from '../../components/Article/ArticleSearchCard'
 import LabelRounded from '../../components/UI/LabelRounded'
-import { useSelector } from 'react-redux'
 import withAuthOverlay from '../../hoc/withAuthOverlay'
 
 function Search(props) {
+  const dispatch = useDispatch()
   const [query, setQuery] = useState('')
   const user = useSelector((state) => state.user)
   const isAuth = user.username && user.password
@@ -29,17 +30,9 @@ function Search(props) {
     setQuery(q)
   }, [props.location.search])
 
-  /* function handleClickSignIn() {
-    props.openOverlayLogin()
-    props.setLoginCallback()
-    props.setRegisterCallback()
+  function handleClickLogout() {
+    dispatch(logout())
   }
-
-  function handleClickGetStarted(e) {
-    props.openOverlayRegister()
-    props.setLoginCallback()
-    props.setRegisterCallback()
-  } */
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -57,8 +50,9 @@ function Search(props) {
       <Navbar shadow>
         <DefaultNavItems
           isAuth={isAuth}
-          handleClickGetStarted={props.openOverlayRegister}
-          handleClickSignIn={props.openOverlayLogin}
+          handleClickGetStarted={props.openOverlayLogin}
+          handleClickSignIn={props.openOverlayRegister}
+          handleClickLogout={handleClickLogout}
         />
       </Navbar>
 

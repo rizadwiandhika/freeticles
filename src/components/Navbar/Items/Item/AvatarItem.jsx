@@ -19,7 +19,7 @@ export default function AvatarIcon(props) {
         </li>
         <hr />
         <li className="my-4 text-gray-500 hover:cursor-pointer hover:text-black ">
-          <p>Sign Out</p>
+          <p onClick={props.handleClickLogout}>Sign Out</p>
         </li>
       </>
     </MenuDropdown>

@@ -104,4 +104,69 @@ const INSERT_TAGS = gql`
   }
 `
 
-export { INSERT_ONE_USER, INSERT_ONE_ARTICLE, INSERT_TAGS }
+/* 
+
+*/
+const INSERT_ONE_LIKE = gql`
+  mutation InsertOneLike($data: likes_insert_input!) {
+    insert_likes_one(object: $data) {
+      articleId
+      likeId
+      username
+    }
+  }
+`
+
+/* 
+
+*/
+const DELETE_LIKE_BY_ID = gql`
+  mutation DeleteLikeById($likeId: Int!) {
+    delete_likes_by_pk(likeId: $likeId) {
+      username
+      articleId
+      likeId
+    }
+  }
+`
+
+/*
+Input:
+"comment": {
+  "articleId": 14,
+  "username": "riza.dwii",
+  "date": "2021-10-05",
+  "commentar": "Wihh keren banget articlenya"
+}
+
+Return:
+{
+  "data": {
+    "insert_comments_one": {
+      "username": "riza.dwii",
+      "commentar": "Wihh keren banget articlenya",
+      "commentId": 1,
+      "articleId": 14
+    }
+  }
+}
+ */
+const INSERT_ONE_COMMENT = gql`
+  mutation InsertOneComment($comment: comments_insert_input!) {
+    insert_comments_one(object: $comment) {
+      username
+      commentar
+      commentId
+      articleId
+    }
+  }
+`
+
+export {
+  INSERT_ONE_USER,
+  INSERT_ONE_ARTICLE,
+  INSERT_TAGS,
+  INSERT_ONE_LIKE,
+  INSERT_ONE_COMMENT,
+  DELETE_LIKE_BY_ID
+}

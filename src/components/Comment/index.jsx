@@ -1,16 +1,23 @@
 import React from 'react'
+import { getDateFormat } from '../../utils'
 
-export default function Comment({ className }) {
+export default function Comment({
+  className,
+  commentData = {
+    username: '',
+    date: '',
+    commentar: ''
+  }
+}) {
   return (
     <div className={className}>
       <p className="font-bold">
-        Hafidz Ariq{' '}
-        <span className="ml-2 font-normal text-gray-500">3 months ago</span>
+        {commentData.username}
+        <span className="ml-2 font-normal text-gray-500">
+          {getDateFormat(commentData.date)}
+        </span>
       </p>
-      <p className="mt-2">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Lorem ipsum
-        dolor sit amet consectetur adipisicing elit. Voluptate, itaque?
-      </p>
+      <p className="mt-2">{commentData.commentar}</p>
     </div>
   )
 }
