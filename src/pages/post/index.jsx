@@ -5,10 +5,11 @@ import { GET_ARTICLE_BY_ID } from '../../graphql/query'
 import {
   INSERT_ONE_COMMENT,
   INSERT_ONE_LIKE,
-  DELETE_LIKE_BY_ID
+  INSERT_ONE_BOOKMARK,
+  DELETE_USER_LIKE,
+  DELETE_USER_BOOKMARK
 } from '../../graphql/mutation'
 import { logout } from '../../store/user'
-import useDebouce from '../../hooks/useDebounce'
 import withAuthOverlay from '../../hoc/withAuthOverlay'
 import Navbar from '../../components/Navbar'
 import NavSearch from '../../containers/Navbar/NavSearch'
@@ -18,34 +19,43 @@ import ArticleBoxCard from '../../components/Article/ArticleBoxCard'
 import Comment from '../../components/Comment'
 import LabelRounded from '../../components/UI/LabelRounded'
 import Tag from '../../components/UI/Tag'
+import MenuDropdown from '../../components/UI/MenuDropdown'
 import {
   ThumbUpIcon,
   ChatIcon,
   BookmarkIcon,
   DotsVerticalIcon
 } from '@heroicons/react/outline'
+
 import loadingFetch from '../../assets/loading-fetch.svg'
 
 function Post(props) {
   const dispatch = useDispatch()
   const user = useSelector((state) => state.user)
+
   const isAuth = user.username && user.password
-  const {
-    loading,
-    data: rawData,
-    error
-  } = useQuery(GET_ARTICLE_BY_ID, {
-    fetchPolicy: 'network-only', // Doesn't check cache before making a network request
+  const [article, setArticle] = useState({
+    loading: true,
+    data: null,
+    error: ''
+  })
+  const { refetch } = useQuery(GET_ARTICLE_BY_ID, {
     variables: {
       articleId: props.match.params.articleId,
       username: user.username
-    }
+    },
+    skip: true
   })
-  const [insertOneComment] = useMutation(INSERT_ONE_COMMENT)
-  // const [deleteLikeById] = useMutation(DELETE_LIKE_BY_ID)
 
-  // const [isLiked, setIsLiked] = useState(false)
+  const [insertOneComment] = useMutation(INSERT_ONE_COMMENT)
+  const [insertOneLike] = useMutation(INSERT_ONE_LIKE)
+  const [insertOneBookmark] = useMutation(INSERT_ONE_BOOKMARK)
+  const [deleteUserLike] = useMutation(DELETE_USER_LIKE)
+  const [deleteUserBookmark] = useMutation(DELETE_USER_BOOKMARK)
+
+  // const [isLiked, setIsLiked] = useState({status: false, count: 0})
   // const [isBookmarked, setIsBookmarked] = useState(false)
+  const [isLiking, setIsLiking] = useState(false)
   const [tempComments, setTempComments] = useState([])
   const [isShowComments, setIsShowComments] = useState(false)
   const [isShowCommentButton, setIsShowCommentButton] = useState(false)
@@ -55,39 +65,77 @@ function Post(props) {
     errorMsg: ''
   })
 
-  console.log(props)
+  useEffect(() => {
+    async function getArticleData() {
+      try {
+        const { data } = await refetch({
+          articleId: props.match.params.articleId,
+          username: user.username
+        })
+        setArticle({ loading: false, error: '', data: data.articles_by_pk })
+      } catch (err) {
+        setArticle({ loading: false, error: err.message, data: null })
+      }
+    }
+    getArticleData()
+  }, [user.username])
 
-  // const isLikedDebounced = useDebouce(isLiked, 300)
+  async function handleSubmitLike(userInfo) {
+    setIsLiking(true)
 
-  // useEffect(() => {
-  //   if (loading || error) return
+    const likeData = {
+      articleId: props.match.params.articleId,
+      username: userInfo.username
+    }
 
-  //   setIsLiked(rawData.articles_by_pk.likes.length > 0)
-  //   setIsBookmarked(rawData.articles_by_pk.bookmarks.length > 0)
-  // }, [loading, rawData, error])
+    try {
+      const { data } = await refetch(likeData)
+      const isLiked = data?.articles_by_pk?.likes.length > 0
 
-  // useEffect(() => {
-  //   async function handleLike() {
-  //     const data = rawData?.articles_by_pk
-  //     const isLiked = data.likes.length > 0
+      isLiked
+        ? await deleteUserLike({ variables: likeData })
+        : await insertOneLike({ variables: { data: likeData } })
 
-  //     try {
-  //       if (isLikedDebounced) {
-  //         const likeId = data.likes[0].likeId
-  //         await deleteLikeById(likeId)
-  //       } else {
+      const { data: newData } = await refetch(likeData)
+      setArticle({ loading: false, error: '', data: newData.articles_by_pk })
+    } catch (error) {
+      console.error(error)
+      alert('failed like')
+    } finally {
+      setIsLiking(false)
+    }
+  }
 
-  //       }
-  //     } catch (error) {}
-  //   }
-  //   handleLike()
-  // }, [isLikedDebounced])
+  async function handleSubmitBookmark(userInfo) {
+    const refetchData = {
+      articleId: props.match.params.articleId,
+      username: userInfo.username
+    }
 
-  // function handleClickLike() {
-  //   setIsLiked((prev) => !prev)
-  // }
+    const userArticleBookmarkData = {
+      username: userInfo.username,
+      articleId: props.match.params.articleId
+    }
 
-  async function handleSubmit(e) {
+    try {
+      const { data } = await refetch(refetchData)
+      const isBookmarked = data?.articles_by_pk?.bookmarks.length > 0
+
+      isBookmarked
+        ? await deleteUserBookmark({ variables: userArticleBookmarkData })
+        : await insertOneBookmark({
+            variables: { data: userArticleBookmarkData }
+          })
+
+      const { data: newData } = await refetch(refetchData)
+      setArticle({ loading: false, error: '', data: newData.articles_by_pk })
+    } catch (error) {
+      console.error(error)
+      alert('failed bookmarking')
+    }
+  }
+
+  async function handleSubmitComment(e) {
     e.preventDefault()
 
     const commentData = {
@@ -113,16 +161,50 @@ function Post(props) {
       })
     }
   }
+
+  function handleClickLike(e) {
+    if (isAuth) return handleSubmitLike(user)
+
+    function callback(err, loginUser) {
+      if (err) return
+
+      props.closeOverlay()
+      handleSubmitLike(loginUser)
+    }
+
+    props.openOverlayLogin()
+    props.setLoginCallback(callback)
+    props.setRegisterCallback(callback)
+  }
+
+  function handleClickBookmark(e) {
+    if (isAuth) return handleSubmitBookmark(user)
+
+    function callback(err, loginUser) {
+      if (err) return
+
+      props.closeOverlay()
+      handleSubmitBookmark(loginUser)
+    }
+
+    props.openOverlayLogin()
+    props.setLoginCallback(callback)
+    props.setRegisterCallback(callback)
+  }
+
   function handleInputChange(e) {
     setInputComment({ ...inputComment, value: e.target.value })
   }
+
   function handleInputFocus() {
     if (isShowCommentButton) return
     setIsShowCommentButton(true)
   }
+
   function handleHideCommentButton() {
     setIsShowCommentButton(false)
   }
+
   function toggleShowComments() {
     setIsShowComments((prev) => !prev)
   }
@@ -148,7 +230,7 @@ function Post(props) {
     dispatch(logout())
   }
 
-  if (loading) {
+  if (article.loading) {
     console.log('loading')
 
     return (
@@ -167,7 +249,8 @@ function Post(props) {
     )
   }
 
-  if (error) {
+  if (article.error) {
+    console.log(article.error)
     return (
       <>
         <Navbar shadow>
@@ -186,13 +269,13 @@ function Post(props) {
     )
   }
 
-  const data = rawData?.articles_by_pk
+  const data = article.data
 
   const likes = data?.likes_aggregate?.aggregate?.count
   const articleComments = data?.comments
 
-  const isLiked = data?.likes.length > 0
   const isBookmarked = data?.bookmarks.length > 0
+  const isLiked = data?.likes.length > 0
   const bookmarkIconFill = isBookmarked ? 'black' : 'white'
   const likeIconFill = isLiked ? 'black' : 'white'
 
@@ -209,10 +292,15 @@ function Post(props) {
       </Navbar>
       <div className="w-11/12 max-w-screen-xl mx-auto">
         <div className="max-w-screen-md my-12 mx-auto border-b border-gray-300">
-          <Article isBookmarked={isBookmarked} isLiked={isLiked} data={data} />
+          <Article
+            isBookmarked={isBookmarked}
+            isLiked={isLiked}
+            data={data}
+            handleClickBookmark={handleClickBookmark}
+          />
 
           <div className="mt-12 flex flex-wrap gap-3">
-            {data.articleTags.map(({ tagName }) => (
+            {data?.articleTags.map(({ tagName }) => (
               <Tag key={tagName} text={tagName} px={2} />
             ))}
           </div>
@@ -224,6 +312,7 @@ function Post(props) {
                   fill={likeIconFill}
                   className="hover:cursor-pointer"
                   width={24}
+                  onClick={isLiking ? null : handleClickLike}
                 />
                 <span>{likes}</span>
               </div>
@@ -243,18 +332,31 @@ function Post(props) {
 
             <div className="mr-4 flex gap-1">
               <BookmarkIcon
+                onClick={handleClickBookmark}
                 fill={bookmarkIconFill}
                 className="hover:cursor-pointer"
                 width={24}
               />
-              <DotsVerticalIcon className="hover:cursor-pointer" width={24} />
+
+              <MenuDropdown>
+                <DotsVerticalIcon
+                  className="hover:cursor-pointer"
+                  width="1.2rem"
+                />
+
+                <>
+                  <li className="my-4 text-gray-500 hover:cursor-pointer hover:text-black ">
+                    Report article
+                  </li>
+                </>
+              </MenuDropdown>
             </div>
           </div>
 
           {isShowComments && (
             <div>
               <div className="border-b border-gray-300 focus-within:border-gray-600">
-                <form className="w-full" onSubmit={handleSubmit}>
+                <form className="w-full" onSubmit={handleSubmitComment}>
                   <input
                     className="block w-full text-base placeholder-gray-400 border-none focus:ring-transparent"
                     onChange={handleInputChange}
@@ -277,7 +379,7 @@ function Post(props) {
                   <LabelRounded py={2} text="Cancel" theme="blue-invert" />
                 </div>
                 <div
-                  onClick={inputComment.loading ? null : handleSubmit}
+                  onClick={inputComment.loading ? null : handleSubmitComment}
                   className="w-24"
                 >
                   <LabelRounded

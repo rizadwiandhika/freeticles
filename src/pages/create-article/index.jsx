@@ -33,7 +33,10 @@ export default function Index(props) {
     title: '',
     subtitle: '',
     tags: [],
-    publishDate: new Date().toISOString().split('T')[0],
+    publishDate: new Date()
+      .toLocaleDateString()
+      .split('T')[0]
+      .replace(/\//g, '-'),
     readingTime: ''
   })
   const [article, setArticle] = useState('')
@@ -98,7 +101,10 @@ export default function Index(props) {
     articleData.content = article
     articleData.readingTime = rt(article).text
     articleData.thumbnail = findThumbnail(article)
-    articleData.publishDate = new Date().toISOString().split('T')[0]
+    articleData.publishDate = new Date()
+      .toLocaleDateString()
+      .split('T')[0]
+      .replace(/\//g, '-')
 
     try {
       setPublishError(false)

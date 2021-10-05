@@ -1,14 +1,16 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { useQuery } from '@apollo/client'
+
 import { GET_USER_ARTICLES } from '../../graphql/query'
 import SelfArticleCard from '../../components/Article/SelfArticleCard'
 import LabelRounded from '../../components/UI/LabelRounded'
+
 import loadingFetch from '../../assets/loading-fetch.svg'
 
 export default function YourArticle(props) {
   const user = useSelector((state) => state.user)
-  const { loading, data, error } = useQuery(GET_USER_ARTICLES, {
+  const { loading, data, error, refetch } = useQuery(GET_USER_ARTICLES, {
     variables: { username: user.username }
   })
 

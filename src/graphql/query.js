@@ -64,7 +64,7 @@ const GET_USER_ARTICLES = gql`
 `
 
 const GET_ARTICLES = gql`
-  query GetArticles {
+  query GetArticles($username: String = "") {
     articles(limit: 20) {
       articleId
       title
@@ -75,6 +75,31 @@ const GET_ARTICLES = gql`
       publishDate
       articleTags {
         tagName
+      }
+      bookmarks(where: { username: { _eq: $username } }) {
+        bookmarkId
+        username
+      }
+    }
+  }
+`
+
+const GET_TODAY_ARTICLES = gql`
+  query GetTodayArticles($today: date!, $username: String = "") {
+    articles(limit: 20, where: { publishDate: { _eq: $today } }) {
+      articleId
+      title
+      thumbnail
+      subtitle
+      username
+      readingTime
+      publishDate
+      articleTags {
+        tagName
+      }
+      bookmarks(where: { username: { _eq: $username } }) {
+        bookmarkId
+        username
       }
     }
   }
@@ -119,7 +144,7 @@ const GET_ARTICLE_BY_ID = gql`
 
 const GET_POPULAR_TAGS = gql`
   query GetPopularTags {
-    tagCountView(limit: 10, order_by: { count: desc_nulls_last }) {
+    tagCountView(limit: 7, order_by: { count: desc_nulls_last }) {
       count
       tagName
     }
@@ -245,6 +270,7 @@ export {
   GET_USER_BOOKMARKS,
   GET_USER_ARTICLES,
   GET_ARTICLES,
+  GET_TODAY_ARTICLES,
   GET_ARTICLE_BY_ID,
   GET_POPULAR_TAGS,
   GET_RELATED_ARTICLES

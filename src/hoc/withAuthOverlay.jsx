@@ -70,7 +70,7 @@ export default function withAuthOverlay(Component) {
         }
       } finally {
         setRegisterLoading(false)
-        registerCallback?.(registerError)
+        registerCallback?.(registerError, registerError ? null : userInput)
       }
     }
 
@@ -79,6 +79,7 @@ export default function withAuthOverlay(Component) {
         return setErrorMessage('Fill the username and password')
       }
 
+      let loggedInUser = null
       let loginError = ''
       let isValid = false
       let fetchedUser = null
@@ -94,8 +95,8 @@ export default function withAuthOverlay(Component) {
         isValid = await bcrypt.compare(userInput.password, fetchedUser.password)
         if (!isValid) throw Error('not found')
 
-        const { name, username } = fetchedUser
-        dispatch(saveUser({ name, username, password: userInput.password }))
+        loggedInUser = { ...fetchedUser, password: userInput.password }
+        dispatch(saveUser(loggedInUser))
 
         // TODO: popup label persegi panjang di pokok kiri bawah layar
       } catch (err) {
@@ -112,7 +113,7 @@ export default function withAuthOverlay(Component) {
         }
       } finally {
         setLoginLoading(false)
-        loginCallback?.(loginError)
+        loginCallback?.(loginError, loggedInUser)
       }
     }
 

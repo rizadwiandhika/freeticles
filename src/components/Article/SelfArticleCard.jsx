@@ -1,15 +1,41 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
+import { DotsVerticalIcon } from '@heroicons/react/outline'
 import { getDateFormat } from '../../utils'
+import MenuDropdown from '../../components/UI/MenuDropdown'
 
 export default function SelfArticleCard({ className, data }) {
   return (
     <div className={className}>
       <div className="max-w-screen-sm">
-        <h1 className="text-xl font-bold">{data?.title}</h1>
-        <h3 className="mt-2 text-gray-500">{data?.subtitle}</h3>
-        <p className="mt-4 text-sm text-gray-500">{`${getDateFormat(
-          data?.publishDate
-        )} • ${data?.readingTime}`}</p>
+        <NavLink
+          to={`/post/${data.articleId}`}
+          className="block text-xl font-bold"
+        >
+          {data?.title}
+        </NavLink>
+        <NavLink
+          to={`/post/${data.articleId}`}
+          className="mt-2 block text-gray-500"
+        >
+          {data?.subtitle}
+        </NavLink>
+        <div className="mt-4 flex gap-3">
+          <p className="text-sm text-gray-500">
+            {`${getDateFormat(data?.publishDate)} • ${data?.readingTime}`}
+          </p>
+          <MenuDropdown>
+            <DotsVerticalIcon className="hover:cursor-pointer" width="1.2rem" />
+            <>
+              <li className="my-4 text-gray-500 hover:cursor-pointer hover:text-black ">
+                Edit article
+              </li>
+              <li className="my-4 text-gray-500 hover:cursor-pointer hover:text-black ">
+                Delete article
+              </li>
+            </>
+          </MenuDropdown>
+        </div>
       </div>
     </div>
   )

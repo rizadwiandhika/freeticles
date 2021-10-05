@@ -17,7 +17,8 @@ const defaultArticleMeta = {
 export default function Article({
   data = {},
   isPreview = false,
-  isBookmarked = false
+  isBookmarked = false,
+  handleClickBookmark = () => {}
 }) {
   return (
     <div>
@@ -31,6 +32,7 @@ export default function Article({
         </div>
         <div className={`flex gap-1 ${isPreview ? 'invisible' : ''}`}>
           <BookmarkIcon
+            onClick={handleClickBookmark}
             className="hover:cursor-pointer"
             width="1.2rem"
             fill={isBookmarked ? 'black' : 'white'}

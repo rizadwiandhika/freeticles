@@ -120,12 +120,21 @@ const INSERT_ONE_LIKE = gql`
 /* 
 
 */
-const DELETE_LIKE_BY_ID = gql`
-  mutation DeleteLikeById($likeId: Int!) {
-    delete_likes_by_pk(likeId: $likeId) {
-      username
-      articleId
-      likeId
+const DELETE_USER_LIKE = gql`
+  mutation DeleteUserLike($username: String!, $articleId: Int!) {
+    delete_likes(
+      where: {
+        _and: [
+          { username: { _eq: $username } }
+          { articleId: { _eq: $articleId } }
+        ]
+      }
+    ) {
+      returning {
+        articleId
+        likeId
+        username
+      }
     }
   }
 `
@@ -162,11 +171,41 @@ const INSERT_ONE_COMMENT = gql`
   }
 `
 
+const INSERT_ONE_BOOKMARK = gql`
+  mutation InsertOneBookmark($data: bookmarks_insert_input!) {
+    insert_bookmarks_one(object: $data) {
+      username
+      bookmarkId
+      articleId
+    }
+  }
+`
+
+const DELETE_USER_BOOKMARK = gql`
+  mutation DeleteUserBookmark($username: String!, $articleId: Int!) {
+    delete_bookmarks(
+      where: {
+        _and: [
+          { username: { _eq: $username } }
+          { articleId: { _eq: $articleId } }
+        ]
+      }
+    ) {
+      returning {
+        username
+        articleId
+      }
+    }
+  }
+`
+
 export {
   INSERT_ONE_USER,
   INSERT_ONE_ARTICLE,
   INSERT_TAGS,
   INSERT_ONE_LIKE,
   INSERT_ONE_COMMENT,
-  DELETE_LIKE_BY_ID
+  INSERT_ONE_BOOKMARK,
+  DELETE_USER_LIKE,
+  DELETE_USER_BOOKMARK
 }

@@ -2,6 +2,7 @@ function getDateFormat(date) {
   if (!date) return ''
 
   const monthNames = [
+    '',
     'January',
     'February',
     'March',

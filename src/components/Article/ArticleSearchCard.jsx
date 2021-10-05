@@ -1,8 +1,14 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 import { BookmarkIcon, ThumbUpIcon } from '@heroicons/react/outline'
 import { getDateFormat } from '../../utils'
 
-export default function ArticleCard({ className, data = {} }) {
+export default function ArticleCard({
+  className,
+  data = {},
+  handleClickBookmark,
+  handleClickLike
+}) {
   const likes = data?.likes_aggregate?.aggregate.count
   const isLiked = data?.likes.length > 0
   const isBookmarked = data?.bookmarks.length > 0
@@ -11,28 +17,31 @@ export default function ArticleCard({ className, data = {} }) {
   return (
     <div className={className}>
       <div className="border-b border-gray-300 pb-6">
-        <p className="text-sm font-bold">Hernowo ari</p>
-        <p className="mt-2 text-sm text-gray-500">
-          {`${date} • ${data?.readingTime} • ${data?.articleTags?.[0]?.tagName}`}
-        </p>
+        <NavLink to={`/post/${data.articleId}`}>
+          <p className="text-sm font-bold">Hernowo ari</p>
+          <p className="mt-2 text-sm text-gray-500">
+            {`${date} • ${data?.readingTime} • ${data?.articleTags?.[0]?.tagName}`}
+          </p>
 
-        <h1 className="mt-4 text-xl font-bold">{data?.title}</h1>
+          <h1 className="mt-4 text-xl font-bold">{data?.title}</h1>
 
-        <img
-          className="my-6 block object-cover max-w-full min-h-image-query max-h-80 "
-          // src="https://miro.medium.com/fit/c/200/134/1*VRAXxJJjOcC0Bk_bEM3eEw.png"
-          // src="https://cdn-images-1.medium.com/max/176/1*7vHAt-cf_fNTwf6blO2W8g.png"
-          src={data?.thumbnail}
-          alt="article thumbnail"
-        />
+          <img
+            className="my-6 block object-cover max-w-full min-h-image-query max-h-80 "
+            // src="https://miro.medium.com/fit/c/200/134/1*VRAXxJJjOcC0Bk_bEM3eEw.png"
+            // src="https://cdn-images-1.medium.com/max/176/1*7vHAt-cf_fNTwf6blO2W8g.png"
+            src={data?.thumbnail}
+            alt="article thumbnail"
+          />
 
-        {/* TODO: kalo jumlah huruf terlalu banyak -> kasih "..." */}
-        <h3>{data?.subtitle}</h3>
-        <h3 className="mt-2 text-sm text-gray-500">Read more...</h3>
+          {/* TODO: kalo jumlah huruf terlalu banyak -> kasih "..." */}
+          <h3>{data?.subtitle}</h3>
+          <h3 className="mt-2 text-sm text-gray-500">Read more...</h3>
+        </NavLink>
 
         <div className="mt-4 flex justify-between">
           <div className="flex items-center gap-1">
             <ThumbUpIcon
+              onClick={handleClickLike}
               fill={isLiked ? 'black' : 'white'}
               className="hover:cursor-pointer"
               width="1.2rem"
@@ -40,6 +49,7 @@ export default function ArticleCard({ className, data = {} }) {
             <span>{likes}</span>
           </div>
           <BookmarkIcon
+            onClick={handleClickBookmark}
             fill={isBookmarked ? 'black' : 'white'}
             className="hover:cursor-pointer"
             width="1.2rem"
