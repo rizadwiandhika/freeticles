@@ -74,13 +74,12 @@ export default function Index(props) {
     setIsPublish((prev) => !prev)
   }
 
-  // TODO: limit only 5 tags allowed
   function handleAddTag(e) {
     e.preventDefault()
     const { tags } = articleMeta
 
     setInputTag('')
-    if (tags.includes(inputTag)) return
+    if (tags.includes(inputTag) || tags.length >= 5) return
 
     setArticleMeta({
       ...articleMeta,
@@ -271,7 +270,9 @@ export default function Index(props) {
                       name="tag"
                       value={inputTag}
                       placeholder="Add tags..."
-                      handleChange={(e) => setInputTag(e.target.value)}
+                      handleChange={(e) =>
+                        setInputTag(e.target.value.toLowerCase())
+                      }
                     />
 
                     <button type="submit" />
