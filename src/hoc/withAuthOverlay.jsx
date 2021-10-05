@@ -33,7 +33,7 @@ export default function withAuthOverlay(Component) {
       console.log('hello login in withOverlay')
     })
 
-    const { refetch } = useQuery(GET_USER_BY_USERNAME)
+    const { refetch } = useQuery(GET_USER_BY_USERNAME, { skip: true })
     // const [lazy, { refetch }] = useLazyQuery(GET_USER_BY_USERNAME)
     const [insertOneUser, insertOneUserInfo] = useMutation(INSERT_ONE_USER)
 

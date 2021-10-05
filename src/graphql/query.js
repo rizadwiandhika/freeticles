@@ -140,7 +140,67 @@ const GET_ARTICLES_RELATED_TO_TAG = gql`
   }
 `
 
-// Bisa pake wildcard, NANTI IMPLEMENTASI HARUS PAKE WILDCARD '%'
+/* 
+Retun value:
+{
+  "data": {
+    "articles": [
+      {
+        "articleId": 14,
+        "articleTags": [
+          {
+            "tagName": "parameter"
+          },
+          {
+            "tagName": "kuliah"
+          },
+          {
+            "tagName": "maknyus"
+          }
+        ],
+        "likes_aggregate": {
+          "aggregate": {
+            "count": 0
+          }
+        },
+        "publishDate": "2021-10-04",
+        "readingTime": "3 mins read",
+        "subtitle": "Hello there....",
+        "thumbnail": "https://firebasestorage.googleapis.com/v0/b/mini-project-alterra.appspot.com/o/public%2Fimages%2Fdefault%2F1633338798272Bidang%20SKEM.png?alt=media&amp;token=54980d5e-97ff-443e-82e0-e521bc442b28",
+        "title": "Cerita seru asyikk",
+        "likes": [],
+        "username": "hernowoari",
+        "bookmarks": []
+      },
+      {
+        "articleId": 15,
+        "articleTags": [
+          {
+            "tagName": "adventure"
+          },
+          {
+            "tagName": "kuliah"
+          }
+        ],
+        "likes_aggregate": {
+          "aggregate": {
+            "count": 0
+          }
+        },
+        "publishDate": "2021-10-05",
+        "readingTime": "1 min read",
+        "subtitle": "Just a testing subtitle",
+        "thumbnail": "https://firebasestorage.googleapis.com/v0/b/mini-project-alterra.appspot.com/o/public%2Fimages%2Fdefault%2F1633393528711SIGNATURE.png?alt=media&amp;token=1a24d31f-18d5-4b49-a15e-af2b9563a5c1",
+        "title": "My First Article",
+        "likes": [],
+        "username": "riza.dwii",
+        "bookmarks": []
+      }
+    ]
+  }
+}
+*/
+//! Bisa pake wildcard, NANTI IMPLEMENTASI HARUS PAKE WILDCARD '%'
 const GET_RELATED_ARTICLES = gql`
   query GetRelatedArticles($keyword: String!, $username: String = "") {
     articles(

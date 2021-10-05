@@ -24,6 +24,7 @@ import {
   BookmarkIcon,
   DotsVerticalIcon
 } from '@heroicons/react/outline'
+import loadingFetch from '../../assets/loading-fetch.svg'
 
 function Post(props) {
   const dispatch = useDispatch()
@@ -53,6 +54,8 @@ function Post(props) {
     loading: false,
     errorMsg: ''
   })
+
+  console.log(props)
 
   // const isLikedDebounced = useDebouce(isLiked, 300)
 
@@ -124,24 +127,63 @@ function Post(props) {
     setIsShowComments((prev) => !prev)
   }
 
+  function afterAuthCallback(err) {
+    if (err) return
+    props.closeOverlay()
+  }
+
   function handleClickSignIn() {
     props.openOverlayLogin()
-    props.setLoginCallback()
-    props.setRegisterCallback()
+    props.setLoginCallback(afterAuthCallback)
+    props.setRegisterCallback(afterAuthCallback)
   }
+
   function handleClickGetStarted() {
     props.openOverlayRegister()
-    props.setLoginCallback()
-    props.setRegisterCallback()
+    props.setLoginCallback(afterAuthCallback)
+    props.setRegisterCallback(afterAuthCallback)
   }
+
   function handleClickLogout() {
     dispatch(logout())
   }
 
-  if (loading) return null
+  if (loading) {
+    console.log('loading')
+
+    return (
+      <>
+        <Navbar shadow>
+          <NavSearch />
+          <DefaultNavItems
+            isAuth={isAuth}
+            handleClickGetStarted={handleClickGetStarted}
+            handleClickSignIn={handleClickSignIn}
+            handleClickLogout={handleClickLogout}
+          />
+        </Navbar>
+        <img className="block mt-8 mx-auto" src={loadingFetch} alt="loading" />
+      </>
+    )
+  }
+
   if (error) {
-    console.error(error)
-    return 'error'
+    return (
+      <>
+        <Navbar shadow>
+          <NavSearch />
+          <DefaultNavItems
+            isAuth={isAuth}
+            handleClickGetStarted={handleClickGetStarted}
+            handleClickSignIn={handleClickSignIn}
+            handleClickLogout={handleClickLogout}
+          />
+        </Navbar>
+        <h1 className="mt-4 text-xl text-center">
+          Something went wrong.. Try again
+        </h1>
+      </>
+    )
   }
 
   const data = rawData?.articles_by_pk
@@ -149,8 +191,8 @@ function Post(props) {
   const likes = data?.likes_aggregate?.aggregate?.count
   const articleComments = data?.comments
 
-  const isLiked = rawData.articles_by_pk.likes.length > 0
-  const isBookmarked = rawData.articles_by_pk.bookmarks.length > 0
+  const isLiked = data?.likes.length > 0
+  const isBookmarked = data?.bookmarks.length > 0
   const bookmarkIconFill = isBookmarked ? 'black' : 'white'
   const likeIconFill = isLiked ? 'black' : 'white'
 
@@ -165,16 +207,14 @@ function Post(props) {
           handleClickLogout={handleClickLogout}
         />
       </Navbar>
-
       <div className="w-11/12 max-w-screen-xl mx-auto">
         <div className="max-w-screen-md my-12 mx-auto border-b border-gray-300">
           <Article isBookmarked={isBookmarked} isLiked={isLiked} data={data} />
 
-          <div className="mt-12 flex flex-wrap gap-4">
-            <Tag px={2} text="Mantapp" />
-            <Tag px={2} text="Asalole" />
-            <Tag px={2} text="Shippuden" />
-            <Tag px={2} text="Goks" />
+          <div className="mt-12 flex flex-wrap gap-3">
+            {data.articleTags.map(({ tagName }) => (
+              <Tag key={tagName} text={tagName} px={2} />
+            ))}
           </div>
 
           <div className="mt-8 pb-8 flex justify-between">

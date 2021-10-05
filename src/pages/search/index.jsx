@@ -1,18 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import qs from 'query-string'
 import { useSelector, useDispatch } from 'react-redux'
+import { useQuery } from '@apollo/client'
+import { GET_RELATED_ARTICLES } from '../../graphql/query'
 import { logout } from '../../store/user'
 import Navbar from '../../components/Navbar'
 import DefaultNavItems from '../../components/Navbar/Items/DefaultNavItems'
 import ArticleSearchCard from '../../components/Article/ArticleSearchCard'
 import LabelRounded from '../../components/UI/LabelRounded'
 import withAuthOverlay from '../../hoc/withAuthOverlay'
+import loadingFetch from '../../assets/loading-fetch.svg'
 
 function Search(props) {
   const dispatch = useDispatch()
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(() => qs.parse(props.location.search).q)
   const user = useSelector((state) => state.user)
   const isAuth = user.username && user.password
+
+  // !BUG kalo variables depends pada state. saat state berubah Query auto ke-triggered
+  const { loading, data, error } = useQuery(GET_RELATED_ARTICLES, {
+    variables: {
+      keyword: `%${qs.parse(props.location.search).q}%`, //! jangan pake state query
+      username: user.username
+    }
+  })
 
   useEffect(() => {
     function callback(err) {
@@ -23,12 +34,6 @@ function Search(props) {
     props.setLoginCallback(callback)
     props.setRegisterCallback(callback)
   }, [])
-
-  useEffect(() => {
-    // TODO: search article based on query
-    const { q } = qs.parse(props.location.search)
-    setQuery(q)
-  }, [props.location.search])
 
   function handleClickLogout() {
     dispatch(logout())
@@ -45,13 +50,42 @@ function Search(props) {
     props.history.push(`/search?q=${query}`)
   }
 
+  /* if (loading) return 'loading'
+  if (error) {
+    console.error(error)
+    return 'error'
+  } */
+
+  let content
+
+  if (loading) {
+    console.log('loading')
+    content = (
+      <img className="block mt-8 mx-auto" src={loadingFetch} alt="loading" />
+    )
+  } else if (error) {
+    content = (
+      <h1 className="mt-4 text-xl text-center">
+        Something went wrong.. Try again
+      </h1>
+    )
+  } else {
+    content = data?.articles?.map((article) => (
+      <ArticleSearchCard
+        key={article.articleId}
+        data={article}
+        className="mt-12"
+      />
+    ))
+  }
+
   return (
     <>
       <Navbar shadow>
         <DefaultNavItems
           isAuth={isAuth}
-          handleClickGetStarted={props.openOverlayLogin}
-          handleClickSignIn={props.openOverlayRegister}
+          handleClickGetStarted={props.openOverlayRegister}
+          handleClickSignIn={props.openOverlayLogin}
           handleClickLogout={handleClickLogout}
         />
       </Navbar>
@@ -72,17 +106,10 @@ function Search(props) {
                 />
               </form>
             </div>
-            <div>
-              <ArticleSearchCard className="mt-12" />
-              <ArticleSearchCard className="mt-12" />
-              <ArticleSearchCard className="mt-12" />
-              <ArticleSearchCard className="mt-12" />
-              <ArticleSearchCard className="mt-12" />
-              <ArticleSearchCard className="mt-12" />
-            </div>
+            <div>{content}</div>
           </div>
         </div>
-        <div className="hidden mx-auto border-l border-gray-300 w-0 md:block md:col-span-1" />
+        <div className="hidden mx-auto border-l min-h-screen border-gray-300 w-0 md:block md:col-span-1" />
         <div className="hidden md:block md:col-span-3">
           <div className="mt-12 sticky top-0 w-full">
             <p className="pb-2 font-bold ">Tags</p>

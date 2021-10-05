@@ -1,37 +1,33 @@
 import React from 'react'
-import {
-  DotsVerticalIcon,
-  BookmarkIcon,
-  ThumbUpIcon
-} from '@heroicons/react/outline'
+import { BookmarkIcon, ThumbUpIcon } from '@heroicons/react/outline'
+import { getDateFormat } from '../../utils'
 
-export default function ArticleCard({
-  className,
-  isLiked = false,
-  isBookmarked = false
-}) {
+export default function ArticleCard({ className, data = {} }) {
+  const likes = data?.likes_aggregate?.aggregate.count
+  const isLiked = data?.likes.length > 0
+  const isBookmarked = data?.bookmarks.length > 0
+  const date = getDateFormat(data?.publishDate)
+
   return (
     <div className={className}>
       <div className="border-b border-gray-300 pb-6">
         <p className="text-sm font-bold">Hernowo ari</p>
         <p className="mt-2 text-sm text-gray-500">
-          Sep 6 • 8 min read • programing
+          {`${date} • ${data?.readingTime} • ${data?.articleTags?.[0]?.tagName}`}
         </p>
 
-        <h1 className="mt-4 text-xl font-bold">
-          21 Best Practices for a Clean React Project{' '}
-        </h1>
+        <h1 className="mt-4 text-xl font-bold">{data?.title}</h1>
 
         <img
           className="my-6 block object-cover max-w-full min-h-image-query max-h-80 "
           // src="https://miro.medium.com/fit/c/200/134/1*VRAXxJJjOcC0Bk_bEM3eEw.png"
           // src="https://cdn-images-1.medium.com/max/176/1*7vHAt-cf_fNTwf6blO2W8g.png"
-          src="https://miro.medium.com/max/1400/1*7MzyPH03m_cuJG0qiscDQA.png"
+          src={data?.thumbnail}
           alt="article thumbnail"
         />
 
         {/* TODO: kalo jumlah huruf terlalu banyak -> kasih "..." */}
-        <h3>A curated list of the best React libraries</h3>
+        <h3>{data?.subtitle}</h3>
         <h3 className="mt-2 text-sm text-gray-500">Read more...</h3>
 
         <div className="mt-4 flex justify-between">
@@ -41,7 +37,7 @@ export default function ArticleCard({
               className="hover:cursor-pointer"
               width="1.2rem"
             />
-            <span>23</span>
+            <span>{likes}</span>
           </div>
           <BookmarkIcon
             fill={isBookmarked ? 'black' : 'white'}
