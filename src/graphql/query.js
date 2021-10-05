@@ -145,11 +145,11 @@ const GET_RELATED_ARTICLES = gql`
   query GetRelatedArticles($keyword: String!, $username: String = "") {
     articles(
       where: {
-        title: { _ilike: $keyword }
-        _or: {
-          subtitle: { _ilike: $keyword }
-          _or: { articleTags: { tagName: { _ilike: $keyword } } }
-        }
+        _or: [
+          { title: { _ilike: $keyword } }
+          { subtitle: { _ilike: $keyword } }
+          { articleTags: { tagName: { _ilike: $keyword } } }
+        ]
       }
     ) {
       articleId
