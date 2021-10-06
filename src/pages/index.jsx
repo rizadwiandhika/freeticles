@@ -172,10 +172,6 @@ function Home(props) {
     props.history.push(`/search?q=${query}`)
   }
 
-  if (cards.error) {
-    console.error(cards.error)
-  }
-
   return (
     <>
       <Navbar shadow>

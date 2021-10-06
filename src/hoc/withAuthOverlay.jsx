@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import bcrypt from 'bcryptjs'
 import { useDispatch } from 'react-redux'
-import { useQuery, useLazyQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client'
 import { XIcon } from '@heroicons/react/outline'
 
 import { GET_USER_BY_USERNAME } from '../graphql/query'
@@ -34,10 +34,9 @@ export default function withAuthOverlay(Component) {
     })
 
     const { refetch } = useQuery(GET_USER_BY_USERNAME, { skip: true })
-    // const [lazy, { refetch }] = useLazyQuery(GET_USER_BY_USERNAME)
-    const [insertOneUser, insertOneUserInfo] = useMutation(INSERT_ONE_USER)
+    const [insertOneUser] = useMutation(INSERT_ONE_USER)
 
-    async function handleRegisterSubmit(e) {
+    async function handleRegisterSubmit() {
       if (!(userInput.name && userInput.username && userInput.password)) {
         return setErrorMessage('Fill the fullname, username, and password')
       }
@@ -51,26 +50,19 @@ export default function withAuthOverlay(Component) {
 
         newUser.password = await bcrypt.hash(newUser.password, SALT)
         await insertOneUser({ variables: { user: newUser } })
-
-        if (insertOneUserInfo.error) throw Error('register failed')
-
         dispatch(saveUser(userInput))
-
         // TODO: popup label persegi panjang di pokok kiri bawah layar
       } catch (err) {
+        console.error(err.message)
         registerError = err.message
-        switch (err.message) {
-          case 'register failed':
-            setErrorMessage('Failed registering user...')
-            break
 
-          default:
-            setErrorMessage('Something went wrong...')
-            break
-        }
+        registerError.includes('users_pkey')
+          ? setErrorMessage('Username already exist')
+          : setErrorMessage('Something went wrong...')
       } finally {
+        const user = registerError ? null : userInput
         setRegisterLoading(false)
-        registerCallback?.(registerError, registerError ? null : userInput)
+        registerCallback?.(registerError, user)
       }
     }
 
@@ -90,17 +82,17 @@ export default function withAuthOverlay(Component) {
         const response = await refetch({ username: userInput.username })
         fetchedUser = response.data.users_by_pk
 
-        if (!fetchedUser) throw Error('not found')
+        if (!fetchedUser) throw Error('user not found')
 
         isValid = await bcrypt.compare(userInput.password, fetchedUser.password)
-        if (!isValid) throw Error('not found')
+        if (!isValid) throw Error('user not found')
 
         loggedInUser = { ...fetchedUser, password: userInput.password }
         dispatch(saveUser(loggedInUser))
 
         // TODO: popup label persegi panjang di pokok kiri bawah layar
       } catch (err) {
-        console.log(err)
+        console.error(err.message)
         loginError = err.message
         switch (err.message) {
           case 'not found':

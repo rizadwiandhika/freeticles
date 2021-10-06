@@ -50,7 +50,6 @@ export default function ReadingList(props) {
 
   const bookmarks = data.users_by_pk.bookmarks
 
-  console.log(bookmarks)
   return (
     <>
       {bookmarks.length > 0 ? (

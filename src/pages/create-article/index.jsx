@@ -174,8 +174,7 @@ export default function Index(props) {
           }
         })
 
-        const result = await Promise.all([update, deleteInsert])
-        console.log(result)
+        await Promise.all([update, deleteInsert])
       } else {
         let result = await insertArticle({ variables: { articleData } })
         const { articleId } = result.data.insert_articles_one
@@ -218,8 +217,6 @@ export default function Index(props) {
                 //// const formData = new FormData()
                 //// formData.append('image', file)
 
-                console.log(file)
-
                 // Save current cursor state
                 const range = quill.getSelection(true)
 
@@ -228,7 +225,6 @@ export default function Index(props) {
                   range.index,
                   'image',
                   // `${window.location.origin}/images/loaders/placeholder.gif`
-                  // 'https://images.unsplash.com/photo-1607434472257-d9f8e57a643d?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=872&q=80'
                   loadingUpload
                 )
 
@@ -242,8 +238,6 @@ export default function Index(props) {
                 quill.deleteText(range.index, 1)
 
                 if (error) return console.error(error)
-
-                console.log('upload finished. url', url)
 
                 // Insert uploaded image
                 quill.insertEmbed(range.index, 'image', url)
@@ -430,26 +424,3 @@ function findThumbnail(article) {
   // const urlRegex = /".*"/
   // return article?.match(imageTagRegex)?.[0]?.match(urlRegex)?.[0]?.slice(1, -1)
 }
-
-/* 
-  <div
-    data-text-editor="name"
-    className="relative h-72 overflow-y-scroll w-4/5 mx-auto bg-red-50"
-  >
-    <ReactQuill
-      // scrollingContainer (query ke HTML element) biar ga bug saat embed link
-      // (kalo ngga nanti posisi scroll Y pas insert link / upload gambar / apapun lah lupa gw, bakal jump ke paling atas.)
-      scrollingContainer={`[data-text-editor="name"]`}
-      className="min-h-full h-auto py-24"
-      bounds={`[data-text-editor="name"]`}
-      theme="snow"
-      modules={modules}
-      formats={formats}
-      placeholder="Write a story..."
-      value={text}
-      onChange={setText}
-    />
-  </div> 
-*/
-
-// Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia perferendis sunt eos vero qui nostrum, et inventore unde molestiae at incidunt totam eaque aliquam, mollitia eum, dolore voluptatibus veritatis repellendus. Asperiores neque minus inventore, quas unde nisi illum ullam eius id officia atque modi amet qui nemo suscipit voluptate dicta, magnam fuga quibusdam. Voluptatem sint exercitationem doloremque nemo quo corporis tempore sed? Neque ab repellendus officia tempore aliquid mollitia, dignissimos culpa voluptatibus nisi odio fugiat, veniam inventore architecto cumque ea! Facilis repellat at, hic dignissimos mollitia perferendis fuga quisquam quos labore eum. Sapiente ipsa quidem voluptas eum consequatur dignissimos vitae dolorem dolore doloribus hic neque unde animi eius similique, asperiores tempore sunt. Quaerat officia eius,

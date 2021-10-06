@@ -279,8 +279,6 @@ function Post(props) {
   }
 
   if (article.loading) {
-    console.log('loading')
-
     return (
       <>
         <Navbar shadow>
@@ -298,7 +296,7 @@ function Post(props) {
   }
 
   if (article.error) {
-    console.log(article.error)
+    console.error(article.error)
     return (
       <>
         <Navbar shadow>
@@ -327,7 +325,6 @@ function Post(props) {
   const bookmarkIconFill = isBookmarked ? 'black' : 'white'
   const likeIconFill = isLiked ? 'black' : 'white'
 
-  console.log(relatedArticle?.data)
   return (
     <>
       <Navbar shadow>
