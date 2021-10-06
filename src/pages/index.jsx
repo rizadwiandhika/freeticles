@@ -82,9 +82,9 @@ function Home(props) {
     getArticles()
   }, [user.username, view])
 
-  async function handleSubmitBookmark(userInfo, articleId) {
+  async function handleSubmitBookmark(userInfo, articleId, afterAuth) {
     const refetchData = {
-      username: user.username,
+      username: userInfo.username,
       today: getCurrentDate()
     }
 
@@ -100,11 +100,18 @@ function Home(props) {
 
       const isBookmarked = data?.articles_by_pk?.bookmarks.length > 0
 
-      isBookmarked
-        ? await deleteUserBookmark({ variables: userArticleBookmarkData })
-        : await insertOneBookmark({
+      if (afterAuth) {
+        isBookmarked ||
+          (await insertOneBookmark({
             variables: { data: userArticleBookmarkData }
-          })
+          }))
+      } else {
+        isBookmarked
+          ? await deleteUserBookmark({ variables: userArticleBookmarkData })
+          : await insertOneBookmark({
+              variables: { data: userArticleBookmarkData }
+            })
+      }
 
       const { data: newData } =
         view === 'recommended'
@@ -126,7 +133,7 @@ function Home(props) {
       if (err) return
 
       props.closeOverlay()
-      handleSubmitBookmark(loginUser, articleId)
+      handleSubmitBookmark(loginUser, articleId, true)
     }
 
     props.openOverlayLogin()

@@ -27,10 +27,10 @@ export default function withAuthOverlay(Component) {
     const [errorMessage, setErrorMessage] = useState('')
 
     const [loginCallback, setLoginCallback] = useState(() => () => {
-      console.log('hello login in withOverlay')
+      console.log('default login callback in withOverlay')
     })
     const [registerCallback, setRegisterCallback] = useState(() => () => {
-      console.log('hello login in withOverlay')
+      console.log('hello register callback withOverlay')
     })
 
     const { refetch } = useQuery(GET_USER_BY_USERNAME, { skip: true })
