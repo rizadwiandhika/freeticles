@@ -44,7 +44,7 @@ export default function ArticleCard({
               onClick={handleClickLike}
               fill={isLiked ? 'black' : 'white'}
               className="hover:cursor-pointer"
-              width="1.2rem"
+              width={20}
             />
             <span>{likes}</span>
           </div>
@@ -52,7 +52,7 @@ export default function ArticleCard({
             onClick={handleClickBookmark}
             fill={isBookmarked ? 'black' : 'white'}
             className="hover:cursor-pointer"
-            width="1.2rem"
+            width={20}
           />
         </div>
       </div>

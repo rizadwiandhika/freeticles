@@ -34,10 +34,10 @@ export default function ArticleCard({ data }) {
 
         <div className="flex items-center">
           <div className="mr-4 flex items-center gap-1">
-            <ThumbUpIcon className="hover:cursor-pointer" width={20} />
+            <ThumbUpIcon fill={isLiked ? 'black' : ''} width={20} />
             <span>{likes}</span>
           </div>
-          <BookmarkIcon className="hover:cursor-pointer" width={20} />
+          <BookmarkIcon fill={isBookmarked ? 'black' : ''} width={20} />
         </div>
       </div>
     </NavLink>

@@ -37,15 +37,12 @@ export default function ArticleCard({
               <BookmarkIcon
                 onClick={handleClickBookmark}
                 className="hover:cursor-pointer"
-                width="1.2rem"
+                width={20}
                 fill={isBookmarked ? 'black' : 'white'}
               />
 
               <MenuDropdown>
-                <DotsVerticalIcon
-                  className="hover:cursor-pointer"
-                  width="1.2rem"
-                />
+                <DotsVerticalIcon className="hover:cursor-pointer" width={20} />
 
                 <>
                   <li className="my-4 text-gray-500 hover:cursor-pointer hover:text-black ">

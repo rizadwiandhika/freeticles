@@ -31,7 +31,7 @@ export default function SelfArticleCard({
             {`${getDateFormat(data?.publishDate)} • ${data?.readingTime}`}
           </p>
           <MenuDropdown>
-            <DotsVerticalIcon className="hover:cursor-pointer" width="1.2rem" />
+            <DotsVerticalIcon className="hover:cursor-pointer" width={20} />
             <>
               <li
                 onClick={handleEditArticle}
