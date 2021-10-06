@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useQuery, useMutation } from '@apollo/client'
-import { GET_ARTICLE_BY_ID } from '../../graphql/query'
+import {
+  GET_ARTICLE_BY_ID,
+  GET_DIFFERENT_RELATED_ARTICLES
+} from '../../graphql/query'
 import {
   INSERT_ONE_COMMENT,
   INSERT_ONE_LIKE,
@@ -32,17 +35,32 @@ import loadingFetch from '../../assets/loading-fetch.svg'
 function Post(props) {
   const dispatch = useDispatch()
   const user = useSelector((state) => state.user)
-
   const isAuth = user.username && user.password
+
+  const [relatedArticle, setRelatedArticle] = useState({
+    loading: true,
+    data: null,
+    error: '',
+    hasRun: false
+  })
   const [article, setArticle] = useState({
     loading: true,
     data: null,
     error: ''
   })
+
   const { refetch } = useQuery(GET_ARTICLE_BY_ID, {
     variables: {
       articleId: props.match.params.articleId,
       username: user.username
+    },
+    skip: true
+  })
+  const { refetch: refetchRelated } = useQuery(GET_DIFFERENT_RELATED_ARTICLES, {
+    variables: {
+      keyword: '',
+      username: user.username,
+      articleId: props.match.params.articleId
     },
     skip: true
   })
@@ -73,8 +91,38 @@ function Post(props) {
           username: user.username
         })
         setArticle({ loading: false, error: '', data: data.articles_by_pk })
+
+        if (relatedArticle.hasRun) return
+
+        const tags = data.articles_by_pk.articleTags
+        let related = []
+        for (let i = 0; i < tags.length; i++) {
+          const { data: relatedData } = await refetchRelated({
+            keyword: tags[i].tagName
+          })
+          related = [...related, ...relatedData.articles]
+
+          if (related.length > 3) {
+            related = related.slice(0, 3)
+            break
+          }
+        }
+
+        setRelatedArticle({
+          loading: false,
+          data: related,
+          error: '',
+          hasRun: true
+        })
       } catch (err) {
+        console.error(err)
         setArticle({ loading: false, error: err.message, data: null })
+        setRelatedArticle({
+          loading: false,
+          error: err.message,
+          data: null,
+          hasRun: true
+        })
       }
     }
     getArticleData()
@@ -279,6 +327,7 @@ function Post(props) {
   const bookmarkIconFill = isBookmarked ? 'black' : 'white'
   const likeIconFill = isLiked ? 'black' : 'white'
 
+  console.log(relatedArticle?.data)
   return (
     <>
       <Navbar shadow>
@@ -408,10 +457,10 @@ function Post(props) {
         </div>
 
         <p className="mt-12 font-bold">More from FREETICLES</p>
-        <div className="md:flex md:gap-8">
-          <ArticleBoxCard />
-          <ArticleBoxCard />
-          <ArticleBoxCard />
+        <div className="mb-16 md:flex md:gap-8">
+          {relatedArticle?.data?.map?.((article) => (
+            <ArticleBoxCard key={article.articleId} data={article} />
+          ))}
         </div>
       </div>
     </>

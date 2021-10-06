@@ -25,13 +25,13 @@ export default function ArticleCard({
 
           <h1 className="mt-4 text-xl font-bold">{data?.title}</h1>
 
-          <img
-            className="my-6 block object-cover max-w-full min-h-image-query max-h-80 "
-            // src="https://miro.medium.com/fit/c/200/134/1*VRAXxJJjOcC0Bk_bEM3eEw.png"
-            // src="https://cdn-images-1.medium.com/max/176/1*7vHAt-cf_fNTwf6blO2W8g.png"
-            src={data?.thumbnail}
-            alt="article thumbnail"
-          />
+          {data?.thumbnail && (
+            <img
+              className="my-6 block object-cover max-w-full min-h-image-query max-h-80 "
+              src={data?.thumbnail}
+              alt="thumbnail"
+            />
+          )}
 
           {/* TODO: kalo jumlah huruf terlalu banyak -> kasih "..." */}
           <h3>{data?.subtitle}</h3>

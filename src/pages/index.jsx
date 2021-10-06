@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { getCurrentDate } from '../utils'
 import { logout } from '../store/user'
 import { useQuery, useMutation } from '@apollo/client'
 import {
@@ -65,11 +66,7 @@ function Home(props) {
   useEffect(() => {
     async function getArticles() {
       try {
-        const fetchData = {
-          username: user.username,
-          today: new Date().toISOString().split('T')[0]
-        }
-
+        const fetchData = { username: user.username, today: getCurrentDate() }
         setCards({ loading: true, error: '', data: null })
 
         const { data } =
@@ -88,7 +85,7 @@ function Home(props) {
   async function handleSubmitBookmark(userInfo, articleId) {
     const refetchData = {
       username: user.username,
-      today: new Date().toISOString().split('T')[0]
+      today: getCurrentDate()
     }
 
     const userArticleBookmarkData = {

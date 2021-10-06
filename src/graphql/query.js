@@ -264,6 +264,50 @@ const GET_RELATED_ARTICLES = gql`
   }
 `
 
+const GET_DIFFERENT_RELATED_ARTICLES = gql`
+  query GetDifferentRelatedArticles(
+    $keyword: String!
+    $articleId: Int!
+    $username: String = ""
+  ) {
+    articles(
+      where: {
+        _and: { articleId: { _neq: $articleId } }
+        _or: [
+          { title: { _ilike: $keyword } }
+          { subtitle: { _ilike: $keyword } }
+          { articleTags: { tagName: { _ilike: $keyword } } }
+        ]
+      }
+      limit: 3
+    ) {
+      articleId
+      articleTags {
+        tagName
+      }
+      likes_aggregate {
+        aggregate {
+          count(columns: likeId)
+        }
+      }
+      publishDate
+      readingTime
+      subtitle
+      thumbnail
+      title
+      likes(where: { username: { _eq: $username } }) {
+        likeId
+        username
+      }
+      username
+      bookmarks(where: { username: { _eq: $username } }) {
+        bookmarkId
+        username
+      }
+    }
+  }
+`
+
 export {
   GET_USERS,
   GET_USER_BY_USERNAME,
@@ -273,5 +317,6 @@ export {
   GET_TODAY_ARTICLES,
   GET_ARTICLE_BY_ID,
   GET_POPULAR_TAGS,
-  GET_RELATED_ARTICLES
+  GET_RELATED_ARTICLES,
+  GET_DIFFERENT_RELATED_ARTICLES
 }

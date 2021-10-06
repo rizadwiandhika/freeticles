@@ -1,10 +1,19 @@
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
+import { Redirect } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import rt from 'reading-time'
+import qs from 'query-string'
 import ReactQuill from 'react-quill'
 import Quill from 'quill'
-import { useMutation } from '@apollo/client'
-import { INSERT_ONE_ARTICLE, INSERT_TAGS } from '../../graphql/mutation'
+import { useMutation, useQuery } from '@apollo/client'
+import { getCurrentDate } from '../../utils'
+import { GET_ARTICLE_BY_ID } from '../../graphql/query'
+import {
+  INSERT_ONE_ARTICLE,
+  INSERT_TAGS,
+  DELETE_AND_INSERT_TAGS_BY_ARTICLE_ID,
+  UPDATE_ARTICLE_BY_ID
+} from '../../graphql/mutation'
 import { uploadImage } from '../../firebase'
 import Article from '../../components/Article'
 import Overlay from '../../components/Overlay'
@@ -28,15 +37,14 @@ Link.sanitize = function (url) {
 
 export default function Index(props) {
   const user = useSelector((state) => state.user)
+  const isAuth = user.username && user.password
+  const [isEditing, setIsEditing] = useState(false)
   const [articleMeta, setArticleMeta] = useState({
     username: user.username,
     title: '',
     subtitle: '',
     tags: [],
-    publishDate: new Date()
-      .toLocaleDateString()
-      .split('T')[0]
-      .replace(/\//g, '-'),
+    publishDate: getCurrentDate(),
     readingTime: ''
   })
   const [article, setArticle] = useState('')
@@ -47,10 +55,50 @@ export default function Index(props) {
   const [publishLoading, setPublishLoading] = useState(false)
   const [publishError, setPublishError] = useState(false)
 
+  const { refetch: refetchArticle } = useQuery(GET_ARTICLE_BY_ID, {
+    skip: true,
+    variables: { articleId: '', username: '' }
+  })
+  const [deleteInsertTagsByArticleId] = useMutation(
+    DELETE_AND_INSERT_TAGS_BY_ARTICLE_ID
+  )
+  const [updateArticleById] = useMutation(UPDATE_ARTICLE_BY_ID)
   const [insertArticle] = useMutation(INSERT_ONE_ARTICLE)
   const [insertTags] = useMutation(INSERT_TAGS)
 
   const quillRef = useRef(null)
+
+  useEffect(() => {
+    async function validateArticle() {
+      const id = qs.parse(props.location.search).edit
+      if (!id) return
+
+      let article
+      try {
+        const { data: raw } = await refetchArticle({ articleId: id })
+        article = raw.articles_by_pk
+      } catch (err) {
+        console.error(err)
+        return alert('Whopss somthing went wrong...')
+      }
+
+      if (article.username !== user.username) {
+        return props.history.replace('/profile/your-article')
+      }
+
+      setIsEditing(true)
+      setArticle(article.content)
+      setArticleMeta({
+        username: user.username,
+        title: article.title,
+        subtitle: article.subtitle,
+        tags: article.articleTags.map(({ tagName }) => tagName),
+        publishDate: article.publishDate,
+        readingTime: article.readingTime
+      })
+    }
+    validateArticle()
+  }, [])
 
   function handleArticleMetaChange(e) {
     const { name, value } = e.target
@@ -66,7 +114,11 @@ export default function Index(props) {
     const readingTime = rt(article).text
 
     setIsPreview((prev) => !prev)
-    setArticleMeta({ ...articleMeta, readingTime })
+    setArticleMeta({
+      ...articleMeta,
+      readingTime,
+      publishDate: getCurrentDate()
+    })
   }
 
   function togglePublish(e) {
@@ -98,32 +150,43 @@ export default function Index(props) {
   async function handlePublish() {
     const { tags: articleTags, ...articleData } = articleMeta
 
+    // tambahan: content & thumbnail
     articleData.content = article
     articleData.readingTime = rt(article).text
     articleData.thumbnail = findThumbnail(article)
-    articleData.publishDate = new Date()
-      .toLocaleDateString()
-      .split('T')[0]
-      .replace(/\//g, '-')
+    articleData.publishDate = getCurrentDate()
 
     try {
       setPublishError(false)
       setPublishLoading(true)
 
-      let result = await insertArticle({ variables: { articleData } })
-      const { articleId } = result.data.insert_articles_one
+      if (isEditing) {
+        const id = qs.parse(props.location.search).edit
+        const { username, ...updatedData } = articleData
+        updatedData.articleId = id
 
-      const tags = articleTags.map((tag) => ({ tagName: tag, articleId }))
-      result = await insertTags({ variables: { tags } })
+        const update = updateArticleById({ variables: updatedData })
+        const deleteInsert = deleteInsertTagsByArticleId({
+          variables: {
+            articleId: id,
+            newTags: articleTags.map((tagName) => ({ articleId: id, tagName }))
+          }
+        })
 
-      console.log(result.data.insert_articleTags)
-      alert('berhasil')
-      props.history.push('/profile/your-article')
+        const result = await Promise.all([update, deleteInsert])
+        console.log(result)
+      } else {
+        let result = await insertArticle({ variables: { articleData } })
+        const { articleId } = result.data.insert_articles_one
+
+        const tags = articleTags.map((tag) => ({ tagName: tag, articleId }))
+        result = await insertTags({ variables: { tags } })
+      }
+
+      props.history.replace('/profile/your-article')
     } catch (error) {
       console.error(error)
-      alert('error')
       setPublishError(true)
-    } finally {
       setPublishLoading(false)
     }
   }
@@ -206,6 +269,8 @@ export default function Index(props) {
     }
   }, [])
 
+  if (!isAuth) return <Redirect to="/" />
+
   return (
     <>
       <Navbar>
@@ -230,7 +295,7 @@ export default function Index(props) {
               className="absolute right-2 transform -translate-y-12 hover:cursor-pointer"
               width={24}
             />
-            <Article isPreview articleMeta={articleMeta} article={article} />
+            <Article isPreview data={{ ...articleMeta, content: article }} />
           </div>
         </div>
       </Overlay>
@@ -357,7 +422,9 @@ export default function Index(props) {
 function findThumbnail(article) {
   const imageTagRegex = /<img([\w\W]+?)>/
   const urlRegex = /".*"/
-  return article?.match(imageTagRegex)?.[0]?.match(urlRegex)?.[0]?.slice(1, -1)
+  return (
+    article?.match(imageTagRegex)?.[0]?.match(urlRegex)?.[0]?.slice(1, -1) || ''
+  )
   // const imageTagRegex = /<img src=".*">/
   // const urlRegex = /".*"/
   // return article?.match(imageTagRegex)?.[0]?.match(urlRegex)?.[0]?.slice(1, -1)

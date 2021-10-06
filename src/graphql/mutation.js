@@ -117,6 +117,32 @@ const INSERT_ONE_LIKE = gql`
   }
 `
 
+const UPDATE_ARTICLE_BY_ID = gql`
+  mutation UpdateArticle(
+    $articleId: Int!
+    $content: String!
+    $publishDate: date!
+    $readingTime: String!
+    $subtitle: String!
+    $thumbnail: String!
+    $title: String!
+  ) {
+    update_articles_by_pk(
+      pk_columns: { articleId: $articleId }
+      _set: {
+        content: $content
+        publishDate: $publishDate
+        readingTime: $readingTime
+        subtitle: $subtitle
+        thumbnail: $thumbnail
+        title: $title
+      }
+    ) {
+      articleId
+    }
+  }
+`
+
 /* 
 
 */
@@ -199,6 +225,35 @@ const DELETE_USER_BOOKMARK = gql`
   }
 `
 
+const DELETE_ARTICLE_BY_ID = gql`
+  mutation DeleteArticleById($articleId: Int!) {
+    delete_articles_by_pk(articleId: $articleId) {
+      username
+      title
+      articleId
+    }
+  }
+`
+
+const DELETE_AND_INSERT_TAGS_BY_ARTICLE_ID = gql`
+  mutation DeleteAndInsertTagsByArticleId(
+    $articleId: Int!
+    $newTags: [articleTags_insert_input!]!
+  ) {
+    delete_articleTags(where: { articleId: { _eq: $articleId } }) {
+      affected_rows
+      returning {
+        tagName
+      }
+    }
+    insert_articleTags(objects: $newTags) {
+      returning {
+        tagName
+      }
+    }
+  }
+`
+
 export {
   INSERT_ONE_USER,
   INSERT_ONE_ARTICLE,
@@ -207,5 +262,8 @@ export {
   INSERT_ONE_COMMENT,
   INSERT_ONE_BOOKMARK,
   DELETE_USER_LIKE,
-  DELETE_USER_BOOKMARK
+  DELETE_USER_BOOKMARK,
+  DELETE_ARTICLE_BY_ID,
+  DELETE_AND_INSERT_TAGS_BY_ARTICLE_ID,
+  UPDATE_ARTICLE_BY_ID
 }

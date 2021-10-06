@@ -4,7 +4,13 @@ import { DotsVerticalIcon } from '@heroicons/react/outline'
 import { getDateFormat } from '../../utils'
 import MenuDropdown from '../../components/UI/MenuDropdown'
 
-export default function SelfArticleCard({ className, data }) {
+export default function SelfArticleCard({
+  className,
+  data,
+  handleDeleteArticle,
+  handleEditArticle,
+  isDeleting
+}) {
   return (
     <div className={className}>
       <div className="max-w-screen-sm">
@@ -27,14 +33,28 @@ export default function SelfArticleCard({ className, data }) {
           <MenuDropdown>
             <DotsVerticalIcon className="hover:cursor-pointer" width="1.2rem" />
             <>
-              <li className="my-4 text-gray-500 hover:cursor-pointer hover:text-black ">
+              <li
+                onClick={handleEditArticle}
+                className="my-4 text-gray-500 hover:cursor-pointer hover:text-black "
+              >
                 Edit article
               </li>
-              <li className="my-4 text-gray-500 hover:cursor-pointer hover:text-black ">
+              <li
+                onClick={handleDeleteArticle}
+                className="my-4 text-gray-500 hover:cursor-pointer hover:text-black "
+              >
                 Delete article
               </li>
             </>
           </MenuDropdown>
+
+          <p
+            className={`"text-sm text-red-600 opacity-70" ${
+              isDeleting ? 'visible' : 'invisible'
+            }`}
+          >
+            Deleting...
+          </p>
         </div>
       </div>
     </div>

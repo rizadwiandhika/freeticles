@@ -61,11 +61,13 @@ export default function ArticleCard({
           to={`/post/${data.articleId}`}
           className="flex items-center w-72"
         >
-          <img
-            className="block w-full h-36 object-cover"
-            src={data?.thumbnail}
-            alt="article thumbnail"
-          />
+          {data?.thumbnail && (
+            <img
+              className="block w-full h-36 object-cover"
+              src={data?.thumbnail}
+              alt=" "
+            />
+          )}
         </NavLink>
       </div>
     </div>

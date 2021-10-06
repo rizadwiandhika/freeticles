@@ -12,7 +12,10 @@ function App(props) {
   // * localStorage udah auto masuk ke redux
   return (
     <Switch>
-      <Route path="/post/:articleId" component={Post} />
+      <Route
+        path="/post/:articleId"
+        render={(props) => <Post key={Math.random()} {...props} />}
+      />
       <Route path="/profile" component={Profile} />
       <Route path="/create-article" component={CreateArticle} />
       <Route path="/search" component={Search} />

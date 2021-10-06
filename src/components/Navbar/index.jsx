@@ -14,7 +14,7 @@ export default function Navbar({ sticky, shadow, children }) {
       <div className="flex w-11/12 max-w-screen-xl my-3 mx-auto">
         <div className="flex-grow flex-shrink-0 flex items-center">
           <NavLink className="font-bold" to="/">
-            FREETICLES LOGO
+            FREETICLES
           </NavLink>
         </div>
         <div className="flex-grow-0 flex-shrink-0 flex items-center gap-4">

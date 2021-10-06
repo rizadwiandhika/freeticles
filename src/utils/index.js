@@ -1,3 +1,4 @@
 import getDateFormat from './getDateFormat'
+import getCurrentDate from './getCurrentDate'
 
-export { getDateFormat }
+export { getDateFormat, getCurrentDate }
