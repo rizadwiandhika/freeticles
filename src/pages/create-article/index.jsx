@@ -25,6 +25,7 @@ import Tag from '../../components/UI/Tag'
 
 import loadingUpload from '../../assets/loading-upload.svg'
 import 'react-quill/dist/quill.snow.css'
+import '../../styles/create-article.css'
 
 // https://github.com/zenoamaro/react-quill/issues/529
 // Quill by default creates relative links if scheme is missing.
@@ -330,7 +331,7 @@ export default function Index(props) {
               </div>
               <div className="md:col-span-1">
                 <h1 className="text-xl">
-                  Publisher: <strong>Riza Dwi Andhika</strong>
+                  Publisher: <strong>{user.username}</strong>
                 </h1>
                 <div className="mt-8 max-w-sm">
                   <p className="my-4 text-gray-500 text-sm">

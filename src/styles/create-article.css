@@ -1,16 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer components {
-  /* .ql-toolbar {
-    @apply absolute top-0 left-0 right-0 bg-white z-10;
-  } */
-  /* .ql-toolbar {
-    @apply sticky top-0 left-0 right-0 bg-white z-10;
-  } */
-}
-/* 
 .ql-toolbar {
   position: sticky;
   top: 0;
@@ -27,12 +14,10 @@
   margin-right: auto;
   height: 18rem;
   max-height: 24rem;
-  @apply w-11/12 max-w-screen-md mx-auto h-72 max-h-96;
 }
 
 .ql-editor iframe {
-  @apply w-11/12 mx-auto h-72 max-h-96;
-  max-width: 768px !important;
+  max-width: 768px !important; /* max-w-screen-md */
   width: 91.6%;
   margin-left: auto;
   margin-right: auto;
@@ -43,12 +28,9 @@
   font-size: 1rem;
   line-height: 1.75rem;
   color: rgb(31, 41, 55);
-  @apply text-base leading-7 text-gray-800;
 }
 .ql-editor img {
   margin-left: auto;
   margin-right: auto;
   object-fit: scale-down;
-  @apply mx-auto object-scale-down;
 }
- */
